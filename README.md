@@ -1,5 +1,7 @@
 # TraduzMods 1.0.0
 
+**Desenvolvimento da 2.0.0:** este ramo prepara a `2.0.0-alpha.1`, com otimizações de fila, glossário, inferência, cache e painel, além de um adaptador Fabric 1.21.1. Veja o [estado e limites da alpha](docs/DESENVOLVIMENTO-2.0.md) e a [comparação das quantizações](docs/BENCHMARK-2.0.md). Os downloads abaixo continuam apontando para a **1.0.0 estável**.
+
 Tradução automática de textos de mods para **português do Brasil**, feita localmente no computador. Usa as traduções nativas disponíveis, prioriza os textos que você abre e salva os resultados em disco para reutilizar nas próximas sessões.
 
 O modelo é **Tencent Hy-MT2-1.8B GGUF Q4_K_M**. Não precisa de chave de API. Modelo e runtime são baixados no primeiro uso; depois, a inferência é local. Esses arquivos não estão incluídos nos JARs deste repositório. O download automático do runtime atualmente atende **Windows x64**; outras plataformas não foram validadas nesta versão.

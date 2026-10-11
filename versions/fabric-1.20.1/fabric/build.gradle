@@ -35,3 +35,14 @@ processResources {
 }
 
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+// Isolated research fixtures; outputs stay outside game instances.
+tasks.register('modelComparisonFixtures', JavaExec) { dependsOn testClasses; classpath = sourceSets.test.runtimeClasspath; mainClass = 'com.modtranslator.core.ModelComparisonFixtures'; args providers.gradleProperty('fixtureMode').getOrElse('prepare'), providers.gradleProperty('fixtureFile').getOrElse(layout.buildDirectory.file('model-fixtures.json').get().asFile.absolutePath); javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) } }
+
+tasks.named('integrationTest') { systemProperty 'traduzmods.test.filter', providers.gradleProperty('testFilter').getOrElse(''); notCompatibleWithConfigurationCache('Integration fixtures need a fresh directory per run.') }
+
+tasks.register('optimizationBenchmark', JavaExec) { dependsOn testClasses; classpath = sourceSets.test.runtimeClasspath; mainClass = 'com.modtranslator.core.OptimizationBenchmark'; javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) } }
+
+tasks.register('persistenceBenchmark', JavaExec) { dependsOn testClasses; classpath = sourceSets.test.runtimeClasspath; mainClass = 'com.modtranslator.core.PersistenceBenchmark'; args providers.gradleProperty('persistenceDirectory').getOrElse(layout.buildDirectory.dir('persistence-benchmark').get().asFile.absolutePath); javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }; notCompatibleWithConfigurationCache('Isolated benchmark data changes every run.') }
+
+tasks.register('nativeOptimizationSmoke', JavaExec) { dependsOn testClasses; classpath = sourceSets.test.runtimeClasspath; mainClass = 'com.modtranslator.core.NativeOptimizationSmoke'; args providers.gradleProperty('nativeDirectory').getOrElse('../validation/native-v2'), providers.gradleProperty('nativeReport').getOrElse('../validation/native-v2/report.json'), providers.gradleProperty('nativeProfile').getOrElse('compact'); javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }; systemProperty 'traduzmods.local.port', '18782' }

@@ -27,13 +27,15 @@ public final class AdaptiveHardwarePolicy {
         int batch=cuda?(hardware.gpuFreeMiB()>=8192?1024:512):256;
         int micro=cuda?(hardware.gpuFreeMiB()>=8192?512:256):128;
         // Longer context does not accelerate short translations; keep the validated 4096-token window.
-        return new Plan(memoryBudget(hardware.totalMemoryMiB(),hardware.freeMemoryMiB()),
+        return new Plan(Math.max(cuda?4096:2048,memoryBudget(hardware.totalMemoryMiB(),hardware.freeMemoryMiB())),
                 threads(hardware.logicalThreads(),worldLoaded),4096,batch,micro,cuda,worldLoaded);
     }
-    /** Only the currently visible text; never competes with rendering for VRAM. */
+    /** Normal can accelerate foreground text with a measured compact GPU profile. Lite stays on CPU. */
     public static Plan onDemandPlan(Hardware hardware,boolean worldLoaded) {
-        return new Plan(LocalResourcePolicy.ON_DEMAND_MEMORY_MIB,
-                Math.max(1,Math.min(2,hardware.logicalThreads())),1024,64,32,false,worldLoaded);
+        boolean gpu=TranslationEdition.current()==TranslationEdition.NORMAL&&LocalResourcePolicy.MEMORY_LIMIT_MIB>=LocalResourcePolicy.ON_DEMAND_GPU_MEMORY_MIB
+                &&hardware.gpuFreeMiB()>=LocalResourcePolicy.ON_DEMAND_GPU_FREE_MIB&&hardware.gpuDriverMajor()>=580&&!System.getProperty("traduzmods.local.acceleration","auto").equalsIgnoreCase("cpu");
+        return new Plan(gpu?LocalResourcePolicy.ON_DEMAND_GPU_MEMORY_MIB:LocalResourcePolicy.ON_DEMAND_MEMORY_MIB,
+                Math.max(1,Math.min(2,hardware.logicalThreads())),1024,64,32,gpu,worldLoaded);
     }
     public static Hardware capture() {
         long total=-1,free=-1;

@@ -16,10 +16,16 @@ final class LocalGpuRuntime {
         return choose(directory,acceleration,status,AdaptiveHardwarePolicy.capture());
     }
     static Choice choose(Path directory,boolean acceleration,Consumer<String> status,AdaptiveHardwarePolicy.Hardware hardware) {
+        return choose(directory,acceleration,status,hardware,4096);
+    }
+    static boolean hasCapacity(AdaptiveHardwarePolicy.Hardware hardware,long minimumFreeMiB) {
+        return hardware.gpuFreeMiB()>=minimumFreeMiB&&hardware.gpuDriverMajor()>=580;
+    }
+    static Choice choose(Path directory,boolean acceleration,Consumer<String> status,AdaptiveHardwarePolicy.Hardware hardware,long minimumFreeMiB) {
         Choice cpu=new Choice(directory.resolve("local/runtime"),"cpu",0);
         if(!acceleration||System.getProperty("traduzmods.local.acceleration","auto").equalsIgnoreCase("cpu")||!System.getProperty("os.name","").toLowerCase(Locale.ROOT).contains("win"))return cpu;
         try {
-            if(hardware.gpuFreeMiB()<4096||hardware.gpuDriverMajor()<580)return cpu;
+            if(!hasCapacity(hardware,minimumFreeMiB))return cpu;
             Path local=directory.resolve("local"),runtime=local.resolve("runtime-cuda"),stamp=runtime.resolve("verified-runtime.txt");
             String expected=LocalBootstrap.RUNTIME_TAG+"\n"+CUDA_HASH+"\n"+CUDA_DLL_HASH+"\n";
             if(!Files.isRegularFile(stamp)||!Files.readString(stamp).equals(expected)||!Files.isRegularFile(runtime.resolve("llama-server.exe"))||!Files.isRegularFile(runtime.resolve("ggml-cuda.dll"))) {

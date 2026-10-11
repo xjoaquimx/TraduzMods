@@ -16,7 +16,7 @@ public final class TranslationPanelMotion {
         double amount=value(now);
         int width=TranslationProgressControl.panelWidth(guiWidth);
         int panelX=6-(int)Math.round((width+7)*amount);
-        TranslationProgressControl.Bounds tab=guiWidth<120||guiHeight<72?null:new TranslationProgressControl.Bounds((int)Math.round((6+width-23)*(1D-amount)),11,18,20);
+        TranslationProgressControl.Bounds tab=guiWidth<120||guiHeight<87?null:new TranslationProgressControl.Bounds((int)Math.round((6+width-23)*(1D-amount)),11,18,20);
         return new Frame(panelX,tab,!target&&amount==0D,target&&amount==1D);
     }
 }

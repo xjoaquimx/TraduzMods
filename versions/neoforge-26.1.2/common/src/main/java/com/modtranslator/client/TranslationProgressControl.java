@@ -7,8 +7,8 @@ public final class TranslationProgressControl {
         public boolean contains(double mouseX,double mouseY){return mouseX>=x&&mouseX<x+width&&mouseY>=y&&mouseY<y+height;}
     }
     public static int panelWidth(int guiWidth){return Math.min(260,guiWidth-12);}
-    public static Bounds bounds(int guiWidth,int guiHeight){return guiWidth<120||guiHeight<72?null:new Bounds(6+panelWidth(guiWidth)-95,11,64,20);}
-    public static Bounds cacheBounds(int guiWidth,int guiHeight){return guiWidth<120||guiHeight<96?null:new Bounds(11,68,panelWidth(guiWidth)-10,20);}
+    public static Bounds bounds(int guiWidth,int guiHeight){return guiWidth<120||guiHeight<87?null:new Bounds(6+panelWidth(guiWidth)-95,11,64,20);}
+    public static Bounds cacheBounds(int guiWidth,int guiHeight){return guiWidth<120||guiHeight<117?null:new Bounds(11,85,panelWidth(guiWidth)-10,20);}
     public static boolean hitCache(boolean screenOpen,boolean hidden,boolean viewVisible,int guiWidth,int guiHeight,double mouseX,double mouseY) {
         Bounds button=cacheBounds(guiWidth,guiHeight);
         return screenOpen&&!hidden&&viewVisible&&button!=null&&button.contains(mouseX,mouseY);

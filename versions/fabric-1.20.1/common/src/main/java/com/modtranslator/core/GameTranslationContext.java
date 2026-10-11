@@ -8,15 +8,12 @@ import java.util.regex.Pattern;
 /** Resource-pack native terminology. Installed by the resource scanner, never by quest-specific translations. */
 public final class GameTranslationContext {
     private static volatile NativeTerminology nativeTerminology=new NativeTerminology(Map.of(),Collections.emptyNavigableMap());
-    private static volatile List<Rule> rules=List.of();
+    private record RuleCatalog(List<Rule> rules,TerminologyIndex index) {}
+    private static volatile RuleCatalog ruleCatalog=new RuleCatalog(List.of(),new TerminologyIndex(List.of()));
     private static final Set<String> QUEST_SOURCES=ConcurrentHashMap.newKeySet();
     private static final Pattern COLORS=Pattern.compile("&(?![A-Za-z][A-Za-z0-9]*;)[0-9a-fk-orA-FK-OR]|§x(?:§[0-9a-fA-F]){6}|§[0-9a-fk-orA-FK-OR]");
     private static final Pattern SKIP=Pattern.compile("</?[A-Za-z][^<>]*>|https?://[^\\s<>]+|%(?:\\d+\\$)?[-#+ 0,(]*\\d*(?:\\.\\d+)?(?:[tT][a-zA-Z]|[a-zA-Z])|%%|\\$\\{[^{}]+}|\\{[^{}]*}|\\$\\([^)]*\\)|[a-z0-9_]+:[a-z0-9_/.-]+|MODTRPHX*\\d+X|&(?![A-Za-z][A-Za-z0-9]*;)[0-9a-fk-orA-FK-OR]|§.");
-    private record Rule(String english,String portuguese,Pattern pattern,String foldedEnglish,boolean asciiEnglish) {
-        private Rule(String english,String portuguese,Pattern pattern) {
-            this(english,portuguese,pattern,english.toLowerCase(Locale.ROOT),isAscii(english));
-        }
-    }
+    private record Rule(String english,String portuguese,Pattern pattern) {}
     private static final List<Rule> ACTIONS=List.of(
             action("Mine","minerar"),action("punch","dar um soco"),action("Left Click","botão esquerdo do mouse"),
             action("Drop","soltar"),action("Craft","criar"),action("Crafting","criação"),action("Smelt","fundir"),action("Smelting","fundição"),
@@ -65,8 +62,17 @@ public final class GameTranslationContext {
             if(plural!=null)names.putIfAbsent(plural,portuguesePlural(entry.getValue()));
         }
         nativeTerminology=NativeTerminology.index(names);
-        rules=names.entrySet().stream().sorted(Comparator.<Map.Entry<String,String>>comparingInt(e->e.getKey().length()).reversed())
+        List<Rule> rules=names.entrySet().stream().sorted(Comparator.<Map.Entry<String,String>>comparingInt(e->e.getKey().length()).reversed())
                 .map(e->new Rule(e.getKey(),e.getValue(),word(e.getKey()))).toList();
+        ruleCatalog=new RuleCatalog(rules,new TerminologyIndex(rules.stream().map(Rule::english).toList()));
+    }
+
+    private static List<Rule> candidateRules(String text) {
+        RuleCatalog catalog=ruleCatalog;
+        BitSet matches=catalog.index.candidates(text);
+        List<Rule> result=new ArrayList<>(matches.cardinality());
+        for(int at=matches.nextSetBit(0);at>=0;at=matches.nextSetBit(at+1))result.add(catalog.rules.get(at));
+        return result;
     }
 
     public static void registerQuestSources(Set<String> sources) { sources.forEach(source->{if(source!=null){String visible=plain(source);QUEST_SOURCES.add(visible);for(String paragraph:visible.split("[\\r\\n]+"))if(!paragraph.isBlank())QUEST_SOURCES.add(paragraph.strip());}}); }
@@ -99,10 +105,9 @@ public final class GameTranslationContext {
         LinkedHashSet<Rule> selected=new LinkedHashSet<>();
         for(String source:sources) {
             String visible=plain(source);
-            String foldedVisible=visible.toLowerCase(Locale.ROOT);
-            for(Rule rule:rules) {
+            for(Rule rule:candidateRules(visible)) {
                 if((rule.english.equalsIgnoreCase("Log")||rule.english.equalsIgnoreCase("Logs"))&&!isQuestSource(source))continue;
-                if(foldedVisible.contains(rule.foldedEnglish)&&rule.pattern.matcher(visible).find())selected.add(rule);
+                if(rule.pattern.matcher(visible).find())selected.add(rule);
             }
         }
         for(Rule rule:selected) {
@@ -117,10 +122,7 @@ public final class GameTranslationContext {
     /** Hy-MT's reference template: keep directives short and terminology source-specific. */
     public static String localReferences(String source) {
         String visible=plain(source);StringBuilder reference=new StringBuilder("Reference the following translations:\n").append(ModTextPolicy.references(visible));
-        String foldedVisible=visible.toLowerCase(Locale.ROOT);boolean asciiVisible=isAscii(visible);
-        // Unicode regex case folding is broader than lowercasing (for example İ and final sigma).
-        // Only ASCII pairs can safely reject a rule before allocating its regex matcher.
-        for(Rule rule:rules)if((!asciiVisible||!rule.asciiEnglish||foldedVisible.contains(rule.foldedEnglish))&&rule.pattern.matcher(visible).find()) {
+        for(Rule rule:candidateRules(visible))if(rule.pattern.matcher(visible).find()) {
             if((rule.english.equalsIgnoreCase("Log")||rule.english.equalsIgnoreCase("Logs"))&&!isQuestSource(source))continue;
             String line=rule.english+" translates to "+rule.portuguese+".\n";
             if(reference.length()+line.length()>TranslationEdition.current().referenceCharacters())break;reference.append(line);
@@ -133,8 +135,7 @@ public final class GameTranslationContext {
     public static String normalizeTranslated(String source,String output) {
         if(!isQuestSource(source)||output==null)return output;
         String visibleSource=plain(source);
-        String foldedSource=visibleSource.toLowerCase(Locale.ROOT);
-        List<Rule> relevant=rules.stream().filter(rule->foldedSource.contains(rule.foldedEnglish)&&rule.pattern.matcher(visibleSource).find()).toList();
+        List<Rule> relevant=candidateRules(visibleSource).stream().filter(rule->rule.pattern.matcher(visibleSource).find()).toList();
         Matcher tokens=SKIP.matcher(output);StringBuilder result=new StringBuilder();int offset=0;
         while(tokens.find()) {
             result.append(normalizeVisible(visibleSource,output.substring(offset,tokens.start()),relevant)).append(tokens.group());offset=tokens.end();
@@ -223,7 +224,6 @@ public final class GameTranslationContext {
         return null;
     }
     private static Rule action(String english,String portuguese) { return new Rule(english,portuguese,word(english)); }
-    private static boolean isAscii(String text) { for(int i=0;i<text.length();i++)if(text.charAt(i)>127)return false;return true; }
     private static Pattern word(String text) { return Pattern.compile("(?<![\\p{L}\\p{N}_])"+Pattern.quote(text)+"(?![\\p{L}\\p{N}_])",Pattern.CASE_INSENSITIVE|Pattern.UNICODE_CASE); }
     private static String replace(String text,Pattern pattern,String replacement) { return pattern.matcher(text).replaceAll(Matcher.quoteReplacement(replacement)); }
     private static String find(Map<String,String> map,String key) {String direct=map.get(key);if(direct!=null)return direct;for(var entry:map.entrySet())if(entry.getKey().equalsIgnoreCase(key))return entry.getValue();return null;}

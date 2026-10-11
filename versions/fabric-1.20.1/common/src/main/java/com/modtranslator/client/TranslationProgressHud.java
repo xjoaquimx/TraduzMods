@@ -31,28 +31,31 @@ public final class TranslationProgressHud {
     public static void render(GuiGraphics graphics) {render(graphics,currentView());}
     public static void render(GuiGraphics graphics,TranslationProgressLayout.View view) {
         var game=Minecraft.getInstance();
-        if(view==null||game.options.hideGui||graphics.guiWidth()<120||graphics.guiHeight()<72)return;
+        if(view==null||game.options.hideGui||graphics.guiWidth()<120||graphics.guiHeight()<87)return;
         var placement=TranslationPanelMotion.frame(TranslationService.isTranslationPanelMinimized(),graphics.guiWidth(),graphics.guiHeight(),System.nanoTime());
         int x=placement.panelX(),y=6,width=TranslationProgressControl.panelWidth(graphics.guiWidth()),inner=width-10;
         var button=game.screen!=null?TranslationProgressControl.bounds(graphics.guiWidth(),graphics.guiHeight()):null;
         
         var cacheButton=game.screen!=null?TranslationProgressControl.cacheBounds(graphics.guiWidth(),graphics.guiHeight()):null;
-        int panelHeight=cacheButton!=null?87:59;
-        graphics.fill(x,y,x+width,y+panelHeight,0xEE101010);
+        int panelHeight=cacheButton!=null?105:75;
+        graphics.fill(x,y,x+width,y+panelHeight,0xED171A18);
         graphics.fill(x,y,x+width,y+1,0xFF686868);
         graphics.fill(x,y+1,x+1,y+panelHeight-1,0xFF686868);
         graphics.fill(x+1,y+panelHeight-1,x+width,y+panelHeight,0xFF202020);
         graphics.fill(x+width-1,y+1,x+width,y+panelHeight-1,0xFF202020);
-        if(lastView!=view){lastView=view;savedText=view.title().equals("Tradução concluída")||view.detail().equals("Cache disponível")?view.detail():"Salvos: "+view.detail();sessionText="Nesta sessão: "+view.sessionCompleted()+" novos";}
+        graphics.fill(x+1,y+1,x+width-1,y+26,0xAA2B302C);
+        graphics.fill(x+1,y+1,x+3,y+panelHeight-1,view.color());
+        if(lastView!=view){lastView=view;savedText=view.title().equals("Tradução concluída")||view.detail().equals("Cache disponível")?view.detail():"Em disco: "+view.detail();sessionText="+"+view.sessionCompleted()+" textos nesta sessão";}
         int headingWidth=button==null?inner-24:inner-96;
-        graphics.drawString(game.font,game.font.plainSubstrByWidth(view.title(),headingWidth),x+5,y+5,view.color(),true);
-        graphics.drawString(game.font,game.font.plainSubstrByWidth(savedText,headingWidth),x+5,y+16,0xFFE0E0E0,true);
-        graphics.drawString(game.font,game.font.plainSubstrByWidth(sessionText,inner),x+5,y+27,0xFFAAAAAA,true);
-        graphics.drawString(game.font,game.font.plainSubstrByWidth(view.reason(),inner),x+5,y+38,0xFFDDCC88,true);
-        graphics.fill(x+5,y+51,x+width-5,y+54,0xFF303030);
+        graphics.drawString(game.font,game.font.plainSubstrByWidth("TraduzMods · "+(com.modtranslator.core.TranslationEdition.current()==com.modtranslator.core.TranslationEdition.NORMAL?"Normal":"Lite"),headingWidth),x+5,y+5,0xFFE9ECE6,true);
+        graphics.drawString(game.font,game.font.plainSubstrByWidth(view.title(),inner),x+5,y+17,view.color(),true);
+        graphics.drawString(game.font,game.font.plainSubstrByWidth(savedText,inner),x+5,y+31,0xFFE0E0E0,true);
+        graphics.drawString(game.font,game.font.plainSubstrByWidth(sessionText,inner),x+5,y+43,0xFFAAAAAA,true);
+        graphics.drawString(game.font,game.font.plainSubstrByWidth(view.reason(),inner),x+5,y+55,0xFFDDCC88,true);
+        graphics.fill(x+5,y+68,x+width-5,y+71,0xFF303030);
         int amount=Math.max(0,Math.min(inner,(int)Math.round(inner*view.fraction())));
-        if(view.indeterminate()){int segment=Math.max(8,inner/4),travel=inner-segment,offset=(int)((Math.sin(System.nanoTime()/600_000_000D)+1D)*0.5D*travel);graphics.fill(x+5+offset,y+51,x+5+offset+segment,y+54,view.color());}
-        else if(amount>0)graphics.fill(x+5,y+51,x+5+amount,y+54,view.color());
+        if(view.indeterminate()){int segment=Math.max(8,inner/4),travel=inner-segment,offset=(int)((Math.sin(System.nanoTime()/600_000_000D)+1D)*0.5D*travel);graphics.fill(x+5+offset,y+68,x+5+offset+segment,y+71,view.color());}
+        else if(amount>0)graphics.fill(x+5,y+68,x+5+amount,y+71,view.color());
         if(button!=null&&placement.expandedInput()){
             boolean paused=TranslationService.isTranslationPaused();
             if(control==null){control=Button.builder(paused?RESUME:PAUSE,b->TranslationService.toggleTranslationPaused()).bounds(button.x(),button.y(),button.width(),button.height()).build();lastPaused=paused;}

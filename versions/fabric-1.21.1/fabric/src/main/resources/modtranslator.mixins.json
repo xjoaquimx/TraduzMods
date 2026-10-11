@@ -1,0 +1,27 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.modtranslator.mixin",
+  "client": [
+    "LanguageMixin",
+    "ClientLanguageMixin",
+    "TranslatableContentsMixin",
+    "MutableComponentMixin",
+    "GuiGraphicsMixin",
+    "FontMixin",
+    "FtbQuestObjectMixin",
+    "FtbQuestMixin",
+    "FtbQuestViewMixin",
+    "NpcChatRefreshMixin",
+    "FancyMenuTextMixin",
+    "TranslationProgressGuiMixin",
+    "TranslationProgressScreenMixin",
+    "TranslationProgressMouseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "compatibilityLevel": "JAVA_21",
+  "refmap": "modtranslator.refmap.json",
+  "plugin": "com.modtranslator.client.ModTranslatorMixinPlugin"
+}

@@ -1,0 +1,288 @@
+{
+  "version": "2.0.0-alpha.1",
+  "date": "2026-10-11",
+  "hardware": {
+    "totalMemoryMiB": 16294,
+    "logicalThreads": 12,
+    "gpu": "NVIDIA GeForce RTX 5060, 8151 MiB, 617.42"
+  },
+  "integrationPassed": 648,
+  "integrationFailed": 0,
+  "builds": [
+    {
+      "platform": "fabric-1.20.1",
+      "edition": "normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.20.1-normal-2.0.0-alpha.1.jar",
+      "sha256": "49c72057d894ba1237631fb4ac171d416f091b2b89661004a769349f52b23829",
+      "bytes": 193147
+    },
+    {
+      "platform": "fabric-1.20.1",
+      "edition": "lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.20.1-lite-2.0.0-alpha.1.jar",
+      "sha256": "8fb17c8a306bf389b50c9098848d7c15b9c17c7d854c56e680088cab3719e269",
+      "bytes": 193143
+    },
+    {
+      "platform": "fabric-1.21.1",
+      "edition": "normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.21.1-normal-2.0.0-alpha.1.jar",
+      "sha256": "8172573e77c87574a2b3272dbf4a2c29336b4d882fda5ab78150654771729d2d",
+      "bytes": 193151
+    },
+    {
+      "platform": "fabric-1.21.1",
+      "edition": "lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.21.1-lite-2.0.0-alpha.1.jar",
+      "sha256": "831ea39c07ee9ba0ef48ec61f4f368f5eafd82caed9aa98088fb4b78910867b2",
+      "bytes": 193148
+    },
+    {
+      "platform": "fabric-26.2",
+      "edition": "normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-26.2-normal-2.0.0-alpha.1.jar",
+      "sha256": "ef0f624ecd799cd1d65e0fe3b1fc84e14e4fab9d5045429308421e00fcd0f5ee",
+      "bytes": 190771
+    },
+    {
+      "platform": "fabric-26.2",
+      "edition": "lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-26.2-lite-2.0.0-alpha.1.jar",
+      "sha256": "d3c1cb338b42ba708b58fc90fa46ffef6b6170b91e2d99550e71c370e62962d9",
+      "bytes": 190768
+    },
+    {
+      "platform": "neoforge-26.1.2",
+      "edition": "normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-neoforge-26.1.2-normal-2.0.0-alpha.1.jar",
+      "sha256": "ee91862a9c727c50f891e206649c43062b4fd07e6de6337dee165147db7e30c7",
+      "bytes": 189805
+    },
+    {
+      "platform": "neoforge-26.1.2",
+      "edition": "lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 81,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-neoforge-26.1.2-lite-2.0.0-alpha.1.jar",
+      "sha256": "45017ada558e60dc1fe5abe7818f2e6143637e7364b8d49db45b663116b0ac28",
+      "bytes": 189802
+    }
+  ],
+  "sharedSourceAndTestComparisons": 84,
+  "stableRelease1_0_0Preserved": true,
+  "nativeProduction": [
+    {
+      "edition": "normal",
+      "profile": "compact",
+      "exitCode": 0,
+      "passed": true,
+      "samples": 492,
+      "peakResidentMiB": 660.203125,
+      "peakPrivateMiB": 2126.62109375,
+      "minimumFreeSystemMiB": 3166.05859375,
+      "medianTranslateMs": 243.0564,
+      "medianReuseMs": 1.8705995,
+      "readingWarmPassed": true,
+      "pressureReservedMiB": 0,
+      "resumePassed": true,
+      "backend": "cuda",
+      "effectiveCompact": true,
+      "startupMs": 6919,
+      "texts": 8
+    },
+    {
+      "edition": "normal",
+      "profile": "full",
+      "exitCode": 0,
+      "passed": true,
+      "samples": 480,
+      "peakResidentMiB": 660.640625,
+      "peakPrivateMiB": 2126.67578125,
+      "minimumFreeSystemMiB": 3140.37109375,
+      "medianTranslateMs": 226.8225505,
+      "medianReuseMs": 1.9545495000000002,
+      "readingWarmPassed": true,
+      "pressureReservedMiB": 0,
+      "resumePassed": true,
+      "backend": "cuda",
+      "effectiveCompact": true,
+      "startupMs": 6536,
+      "texts": 8
+    },
+    {
+      "edition": "lite",
+      "profile": "compact",
+      "exitCode": 0,
+      "passed": true,
+      "samples": 938,
+      "peakResidentMiB": 1588.734375,
+      "peakPrivateMiB": 858.640625,
+      "minimumFreeSystemMiB": 1937.52734375,
+      "medianTranslateMs": 3122.9740505,
+      "medianReuseMs": 2.3359005,
+      "readingWarmPassed": true,
+      "pressureReservedMiB": 0,
+      "resumePassed": true,
+      "backend": "cpu",
+      "effectiveCompact": true,
+      "startupMs": 6564,
+      "texts": 8
+    }
+  ],
+  "nativeFullCapacityPriorReference": {
+    "edition": "normal",
+    "profile": "full",
+    "exitCode": 0,
+    "passed": true,
+    "samples": 46,
+    "peakResidentMiB": 656.64453125,
+    "peakPrivateMiB": 2339.32421875,
+    "minimumFreeSystemMiB": 6565.2109375,
+    "medianTranslateMs": 153.91035,
+    "medianReuseMs": 1.3449,
+    "readingWarmPassed": false,
+    "pressureReservedMiB": 0,
+    "backend": "cuda",
+    "startupMs": 3997,
+    "texts": 8
+  },
+  "nativeMemoryPressure": [
+    {
+      "edition": "normal",
+      "profile": "compact",
+      "exitCode": 0,
+      "passed": true,
+      "samples": 482,
+      "peakResidentMiB": 660.59765625,
+      "peakPrivateMiB": 2126.48828125,
+      "minimumFreeSystemMiB": 1805.24609375,
+      "medianTranslateMs": 228.7849,
+      "medianReuseMs": 2.0694500000000002,
+      "readingWarmPassed": true,
+      "pressureReservedMiB": 1440,
+      "resumePassed": true,
+      "backend": "cuda",
+      "effectiveCompact": true,
+      "startupMs": 6636
+    }
+  ],
+  "persistenceBaseline": {
+    "cachedRecords": 30000,
+    "checkpointBytes": 8816672,
+    "medianFullCheckpointMs": 53.776,
+    "medianEightRecordJournalMs": 0.6014,
+    "journalRecoveredRecords": 400
+  },
+  "persistenceOptimized": {
+    "cachedRecords": 30000,
+    "checkpointBytes": 7916671,
+    "medianFullCheckpointMs": 50.1805,
+    "medianEightRecordJournalMs": 0.6194,
+    "journalRecoveredRecords": 400
+  },
+  "mixinTargetChecks": [
+    {
+      "platform": "fabric-1.20.1",
+      "result": "PASS: 10 mixins, 28 exact method targets, 3 shadow fields; ModifyVariable arguments unambiguous.",
+      "optionalTargetsAbsent": [
+        "de/keksuccino/fancymenu/util/rendering/text/markdown/MarkdownRenderer",
+        "dev/ftb/mods/ftbquests/quest/Quest",
+        "dev/ftb/mods/ftbquests/quest/QuestObjectBase",
+        "dev/ftb/mods/ftbquests/client/gui/quests/ViewQuestPanel"
+      ]
+    },
+    {
+      "platform": "fabric-1.21.1",
+      "result": "PASS: 10 mixins, 28 exact method targets, 3 shadow fields; ModifyVariable arguments unambiguous.",
+      "optionalTargetsAbsent": [
+        "de/keksuccino/fancymenu/util/rendering/text/markdown/MarkdownRenderer",
+        "dev/ftb/mods/ftbquests/quest/Quest",
+        "dev/ftb/mods/ftbquests/quest/QuestObjectBase",
+        "dev/ftb/mods/ftbquests/client/gui/quests/ViewQuestPanel"
+      ]
+    },
+    {
+      "platform": "fabric-26.2",
+      "result": "PASS: 10 mixins, 28 exact method targets, 4 shadow fields; ModifyVariable arguments unambiguous.",
+      "optionalTargetsAbsent": [
+        "de/keksuccino/fancymenu/util/rendering/text/markdown/MarkdownRenderer",
+        "dev/ftb/mods/ftbquests/quest/Quest",
+        "dev/ftb/mods/ftbquests/quest/QuestObjectBase",
+        "dev/ftb/mods/ftbquests/client/gui/quests/ViewQuestPanel"
+      ]
+    },
+    {
+      "platform": "neoforge-26.1.2",
+      "result": "PASS: 14 mixins, 37 exact method targets, 6 shadow fields; ModifyVariable arguments unambiguous.",
+      "optionalTargetsAbsent": [
+        "de/keksuccino/fancymenu/util/rendering/text/markdown/MarkdownRenderer"
+      ]
+    }
+  ],
+  "minecraftClientUi": {
+    "version": "1.21.1",
+    "passed": true,
+    "syntheticCounters": true,
+    "checks": [
+      "real Minecraft launch and native fonts/widgets",
+      "pause and resume button callbacks",
+      "cache visibility button callback",
+      "collapse/expand animation"
+    ]
+  },
+  "portableModelBenchmarkSmokePassed": true,
+  "limitations": [
+    "Candidate alpha; no stable 2.0.0 publication.",
+    "Native inference measured without Minecraft; other desktop applications remained open. Not an FPS benchmark. profile records the request; effectiveCompact records the actual automatic fallback.",
+    "Minecraft 1.21.1 rendered native HUD and exercised button callbacks with synthetic counters; actual modpack acceptance remains pending.",
+    "Fabric 1.21.1 optional FTB/FancyMenu integrations need tests with those mods installed.",
+    "No support claim for all Minecraft versions after 1.7.",
+    "Formatting/name preservation is not a guarantee of correct meaning."
+  ]
+}

@@ -82,12 +82,15 @@ class TranslationServiceIntegrationTest {
     static Map<?,?> jobs()throws Exception{return (Map<?,?>)value(service(),"jobs");}
     static void closeService()throws Exception {
         Object s=service();if(s==null)return;
-        set(s,"closed",true); ((ScheduledExecutorService)value(s,"worker")).shutdownNow();invoke(s,"persistSafely");
+        set(s,"closed",true); ScheduledExecutorService worker=(ScheduledExecutorService)value(s,"worker");
+        worker.shutdown();if(!worker.awaitTermination(3,TimeUnit.SECONDS)){worker.shutdownNow();check(worker.awaitTermination(3,TimeUnit.SECONDS),"test worker failed to stop");}invoke(s,"persistSafely");
         field(TranslationService.class,"instance").set(null,null);
         field(TranslationService.class,"portugueseActive").setBoolean(null,false);
     }
     static void initializeLocal(Path configDirectory,Mock mock,boolean ready)throws Exception {
         TranslationService.initialize(configDirectory,List.of("testmod"));mock.ready=ready;set(service(),"provider",mock);
+        // A headless suite has no game screen. Reading-screen tests inject their own probe.
+        set(service(),"readingScreenProbe",(BooleanSupplier)()->false);
     }
     static Path init(String name,Mock mock,boolean ready)throws Exception {
         closeService();Path dir=root.resolve(name);Files.createDirectories(dir.resolve("modtranslator"));
@@ -111,14 +114,71 @@ class TranslationServiceIntegrationTest {
         long rev=TranslationService.revision();
         TranslationService.languageLoaded(manager(en,pt,override),List.of("en_us","pt_br"));
         await(()->TranslationService.revision()>rev+1,"resource scan revision");
+        // The revision is published before the scan finishes its checkpoint/HUD update.
+        ((ScheduledExecutorService)value(service(),"worker")).submit(()->{}).get(12,TimeUnit.SECONDS);
     }
     static String translated(String key,String source){return TranslationService.translateIfCachedOrQueue(key,source);}
-    static void test(String name,Checked run){try{run.run();passed++;System.out.println("PASS "+name);}catch(Throwable e){failures.add(name+": "+e);System.out.println("FAIL "+name+": "+e);e.printStackTrace(System.out);}finally{try{closeService();}catch(Exception e){failures.add("cleanup: "+e);}}}
+    static void test(String name,Checked run){String filter=System.getProperty("traduzmods.test.filter","");if(!filter.isBlank()&&!name.contains(filter))return;try{run.run();passed++;System.out.println("PASS "+name);}catch(Throwable e){failures.add(name+": "+e);System.out.println("FAIL "+name+": "+e);e.printStackTrace(System.out);}finally{try{closeService();}catch(Exception e){failures.add("cleanup: "+e);}}}
     interface Checked{void run()throws Exception;}
     public static void main(String[] args)throws Exception {
+        // Initialize logging on the main thread, before teardown can interrupt a worker.
+        com.mojang.logging.LogUtils.getLogger();
         // Inject the fake local provider before any resource scan can admit native inference.
         // Native inference has its own isolated suite.
         root=Path.of(args[0]);Files.createDirectories(root);
+        test("indexed_queue_preserves_randomized_and_concurrent_priorities",OptimizationChecks::queue);
+        test("compact_prompt_keeps_short_native_item_names_after_long_tool_names",()->{
+            GameTranslationContext.install(Map.of("Wooden Pickaxe","Picareta de madeira","Furnace","Fornalha","Cobblestone","Pedregulho","Stone","Pedra","Coal","Carvão","Stick","Graveto","Oak Wood","Madeira de carvalho"));
+            String prompt=TranslationPrompt.build("With your Wooden Pickaxe, you can mine stone to obtain cobblestone. A furnace needs fuel: wood, coal and sticks work.",true);
+            check(prompt.contains("Sticks translates to Gravetos."),"compact prompt dropped the native label for sticks");
+        });
+        test("periodic_checkpoint_defers_visible_work_without_losing_durable_results",()->{
+            try(Mock mock=new Mock()) {
+                Path dir=init("visible-checkpoint",mock,false);Object svc=service();((AtomicBoolean)value(svc,"busy")).set(true);
+                String first="The first machine contains your tools.",visible="The next machine contains your tools.";
+                scan(Map.of("option.testmod.first",first,"option.testmod.next",visible),Map.of(),Map.of());
+                byte[] before=Files.readAllBytes(dir.resolve("translations.json"));
+                byte[] pendingBefore=Files.readAllBytes(dir.resolve("pending.json"));
+                Method commit=svc.getClass().getDeclaredMethod("commitResults",List.class,List.class,boolean.class);commit.setAccessible(true);
+                commit.invoke(svc,List.of(jobs().get(first)),List.of("A primeira máquina contém suas ferramentas."),false);
+                translated("option.testmod.next",visible);set(svc,"lastCheckpoint",0L);set(svc,"lastQueueSnapshot",0L);
+                Method persist=svc.getClass().getDeclaredMethod("persist",boolean.class);persist.setAccessible(true);persist.invoke(svc,false);
+                check(Arrays.equals(before,Files.readAllBytes(dir.resolve("translations.json"))),"foreground wait rewrote the full cache");
+                check(Arrays.equals(pendingBefore,Files.readAllBytes(dir.resolve("pending.json"))),"foreground wait rewrote the full catalog queue");
+                check(CacheJournal.recover(dir.resolve("translations.journal.jsonl")).size()==1,"deferred checkpoint lost its durable delta");
+                commit.invoke(svc,List.of(jobs().get(visible)),List.of("A próxima máquina contém suas ferramentas."),false);persist.invoke(svc,false);
+                check(CacheJournal.recover(dir.resolve("translations.journal.jsonl")).isEmpty(),"idle checkpoint failed to consolidate the journal");
+                check(JsonParser.parseString(Files.readString(dir.resolve("translations.json"))).getAsJsonArray().size()==2,"idle checkpoint omitted committed translations");
+                closeService();initializeLocal(dir.getParent(),mock,false);
+                scan(Map.of("option.testmod.first",first,"option.testmod.next",visible),Map.of(),Map.of());
+                check(translated("option.testmod.first",first).equals("A primeira máquina contém suas ferramentas.")&&translated("option.testmod.next",visible).equals("A próxima máquina contém suas ferramentas."),"compact checkpoint failed to reload");
+            }
+        });
+        test("terminology_index_preserves_exhaustive_unicode_and_suffix_matches",OptimizationChecks::terminology);
+        test("paragraph_memo_bounds_memory_preserves_context_and_evicts_LRU",()->{
+            TranslationMemo memo=new TranslationMemo(600,2);
+            memo.put("context A","first");memo.put("context B","second");
+            check("first".equals(memo.get("context A")),"memo lookup lost result");
+            memo.put("context C","third");
+            check(memo.get("context B")==null&&memo.size()==2,"memo does not evict least-used entry");
+            memo.put("context A","replaced");
+            check("replaced".equals(memo.get("context A"))&&memo.bytes()<=600,"replacement breaks byte accounting");
+            memo.put("huge","x".repeat(1000));check(memo.get("huge")==null&&memo.size()==2,"oversized paragraph evicted bounded useful entries");
+            check(memo.get("new glossary context")==null,"memo reuses translation from different native terminology");
+        });
+        test("full_queue_promotes_existing_visible_work_without_admitting_extra_jobs",()->{
+            try(Mock mock=new Mock()) {
+                init("full-queue-visible",mock,false);Object svc=service();((AtomicBoolean)value(svc,"busy")).set(true);
+                set(value(svc,"config"),"maxQueueEntries",1000);
+                Method enqueue=svc.getClass().getDeclaredMethod("enqueue",String.class,String.class,boolean.class);enqueue.setAccessible(true);
+                for(int i=0;i<1000;i++)enqueue.invoke(svc,"option.testmod."+i,"This pending tool number "+i,false);
+                String existing="This pending tool number 999";
+                enqueue.invoke(svc,"option.testmod.999",existing,true);
+                enqueue.invoke(svc,"option.testmod.extra","This extra pending tool",true);
+                check(jobs().size()==1000&&!jobs().containsKey("This extra pending tool"),"queue capacity was bypassed");
+                check(((Deque<?>)value(svc,"visible")).contains(existing)&&!((Deque<?>)value(svc,"background")).contains(existing),"full queue refused existing visible priority");
+            }
+        });
 
 
 
@@ -435,7 +495,10 @@ class TranslationServiceIntegrationTest {
                 await(()->{try{return "Arsenal".equals(((Map<?,?>)bySource.get(svc)).get("Armory"));}catch(Exception e){throw new RuntimeException(e);}},"canonical ready entry behind provider-blocked visible text");
                 check(jobs().size()==1&&jobs().containsKey(waiting),"provider-blocked source was dropped");
                 @SuppressWarnings("unchecked") Deque<String> queue=(Deque<String>)value(svc,"visible");
-                check(queue.stream().filter(waiting::equals).count()==1,"provider-blocked source duplicated");
+                // A concurrent tick briefly holds this job in its deferred map.
+                // Observe its eventual requeue, then check uniqueness separately.
+                await(()->queue.stream().filter(waiting::equals).count()==1,"provider-blocked source was not requeued");
+                check(queue.stream().filter(waiting::equals).count()<=1,"provider-blocked source duplicated");
                 check(mock.sent.isEmpty(),"canonical UI unexpectedly used local provider");
             }
         });
@@ -1174,24 +1237,36 @@ class TranslationServiceIntegrationTest {
         });
 
         test("compact_on_demand_RAM_admission_requires_budget_and_game_reserve",()->{
-            check(LocalResourcePolicy.ON_DEMAND_MEMORY_MIB==1792&&LocalResourcePolicy.ON_DEMAND_RESERVE_MIB==1536,"compact local allocation changes protected game reserve");
-            check(LocalResourcePolicy.minimumOnDemandFreeMemoryMiB()==3328,"compact admission omits model budget or reserve");
+            check(LocalResourcePolicy.ON_DEMAND_MEMORY_MIB==1792&&LocalResourcePolicy.ON_DEMAND_RESERVE_MIB==384,"compact local allocation changes protected game reserve");
+            check(LocalResourcePolicy.minimumOnDemandFreeMemoryMiB()==2176,"compact admission omits model budget or reserve");
             var plan=AdaptiveHardwarePolicy.onDemandPlan(new AdaptiveHardwarePolicy.Hardware(16384,3328,24,8192,12288,580),true);
-            check(plan.memoryBudgetMiB()==1792&&plan.threads()==2&&plan.contextTokens()==1024&&plan.batchTokens()==64&&plan.microBatchTokens()==32,"compact local profile inflates allocation");
-            check(!plan.gpuEligible()&&plan.worldLoaded(),"compact on-demand uses game VRAM or loses world state");
-            check(!LocalResourcePolicy.canStartOnDemand(-1)&&!LocalResourcePolicy.canStartOnDemand(3327)&&LocalResourcePolicy.canStartOnDemand(3328),"compact startup boundary or unknown-memory rejection wrong");
-            check(!LocalResourcePolicy.underPressure(1536)&&LocalResourcePolicy.underPressure(1535),"compact lower threshold weakens running game pressure guard");
+            boolean gpu=TranslationEdition.current()==TranslationEdition.NORMAL;
+            check(plan.memoryBudgetMiB()==(gpu?2560:1792)&&plan.threads()==2&&plan.contextTokens()==1024&&plan.batchTokens()==64&&plan.microBatchTokens()==32,"compact local profile inflates allocation");
+            check(plan.gpuEligible()==gpu&&plan.worldLoaded(),"compact on-demand backend or world state wrong");
+            check(!LocalResourcePolicy.canStartOnDemand(-1)&&!LocalResourcePolicy.canStartOnDemand(2175)&&LocalResourcePolicy.canStartOnDemand(2176),"compact startup boundary or unknown-memory rejection wrong");
+            check(!LocalResourcePolicy.underPressure(384,true)&&LocalResourcePolicy.underPressure(383,true),"compact inference reserve boundary wrong");
+            check(LocalResourcePolicy.underPressure(1000,false)&&!LocalResourcePolicy.underPressure(1000,true),"foreground incorrectly shares the catalog RAM gate");
+            check(!LocalResourcePolicy.canStartOnDemand(1535,true)&&LocalResourcePolicy.canStartOnDemand(1536,true),"measured GPU host admission boundary wrong");
+            check(LocalResourcePolicy.underPressure(767,true,true)&&!LocalResourcePolicy.underPressure(768,true,true),"GPU reserve differs from watchdog");
+            check(!AdaptiveHardwarePolicy.onDemandPlan(new AdaptiveHardwarePolicy.Hardware(16384,2048,12,2048,8192,580),true).gpuEligible(),"compact GPU ignores free VRAM headroom");
+            check(!AdaptiveHardwarePolicy.onDemandPlan(new AdaptiveHardwarePolicy.Hardware(16384,2048,12,3071,8192,580),true).gpuEligible(),"compact GPU starts below measured headroom");
+            check(AdaptiveHardwarePolicy.onDemandPlan(new AdaptiveHardwarePolicy.Hardware(16384,2048,12,3072,8192,580),true).gpuEligible()==gpu,"compact GPU rejects usable measured headroom");
         });
-        test("compact_local_provider_only_processes_visible_texts_in_single_source_batches",()->{
+        test("compact_local_provider_prioritizes_visible_texts_and_Normal_finishes_catalog",()->{
             try(Mock mock=new Mock()){
                 init("compact-local-visible",mock,true);Object svc=service();((AtomicBoolean)value(svc,"busy")).set(true);mock.economyMode=true;
                 String first="This first visible tool stores your items.",second="This second visible tool stores your items.",catalog="This background tool stores your items.";
                 scan(Map.of("option.testmod.first",first,"option.testmod.second",second,"option.testmod.catalog",catalog),Map.of(),Map.of());
                 translated("option.testmod.first",first);translated("option.testmod.second",second);((AtomicBoolean)value(svc,"busy")).set(false);invoke(svc,"requestTick");
                 await(()->translated("option.testmod.first",first).startsWith("PT: ")&&translated("option.testmod.second",second).startsWith("PT: "),"compact visible queue failed to finish");
-                Thread.sleep(350);check(mock.sent.size()==2&&!mock.sent.contains(catalog)&&jobs().size()==1&&jobs().containsKey(catalog),"compact mode translates catalog or drops unscheduled source");
-                check(mock.payloads.size()==2&&mock.payloads.stream().allMatch(p->p.getAsJsonArray("text").size()==1),"compact inference inflates local batch size");
-                check(mock.stops.get()>0,"compact model retained after visible work completed");
+                if(TranslationEdition.current()==TranslationEdition.NORMAL) {
+                    await(()->{try{return jobs().isEmpty();}catch(Exception e){return false;}},"Normal compact mode never finishes queued catalog");
+                    check(mock.sent.size()==3&&mock.sent.subList(0,2).containsAll(List.of(first,second))&&mock.sent.get(2).equals(catalog),"compact catalog outranks visible work");
+                } else {
+                    Thread.sleep(350);check(mock.sent.size()==2&&!mock.sent.contains(catalog)&&jobs().size()==1&&jobs().containsKey(catalog),"Lite translates hidden catalog or drops unscheduled source");
+                }
+                check(mock.payloads.stream().allMatch(p->p.getAsJsonArray("text").size()==1),"compact inference inflates local batch size");
+                await(()->mock.stops.get()>0,"compact model retained after eligible work completed");
             }
         });
 
@@ -1228,10 +1303,10 @@ class TranslationServiceIntegrationTest {
                 Thread.sleep(250);check(mock.sent.size()==1&&mock.sent.get(0).equals(visible)&&jobs().size()==1&&jobs().containsKey(catalog),"quest reading competes with catalog translations");
                 check(mock.stops.get()==0,"compact model unloads between visible quests while reading screen remains open");
                 check(!TranslationService.isTranslationPaused(),"reading-screen priority changes user's pause preference");
-                set(svc,"readingScreenProbe",(BooleanSupplier)()->false);invoke(svc,"requestTick");await(()->mock.stops.get()>0,"compact model retained after closing reading screen");
-                mock.economyMode=false;invoke(svc,"requestTick");
+                set(svc,"readingScreenProbe",(BooleanSupplier)()->false);invoke(svc,"requestTick");
                 if(TranslationEdition.current()==TranslationEdition.NORMAL)await(()->{try{return jobs().isEmpty();}catch(Exception e){return false;}},"closing reading screen failed to resume Normal catalog");
                 else check(jobs().containsKey(catalog),"Lite starts hidden catalog when reading screen closes");
+                await(()->mock.stops.get()>0,"compact model retained after closing reading screen and finishing eligible work");
             }
         });
 

@@ -17,6 +17,7 @@ import java.util.regex.Pattern;
 public final class TranslationService {
     private static final System.Logger LOG = System.getLogger("ModTranslator");
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
+    private static final Gson CACHE_JSON = new Gson();
     private static final int TRANSLATION_QUALITY_VERSION = 2;
     private static final Pattern LANGUAGE_FORMAT = Pattern.compile("%(\\d+\\$)?[\\d.]*[df]");
     static final Pattern FORMAT_TOKEN = Pattern.compile("%(?:\\d+\\$)?[-#+ 0,(]*\\d*(?:\\.\\d+)?[a-zA-Z]|%%|\\$\\{[^{}]+}|\\{(?:\\d+|[A-Za-z_][\\w.-]*)(?:,[^{}]*)?}|§.|&(?![A-Za-z][A-Za-z0-9]*;)[0-9a-fk-orA-FK-OR]|\\$\\([^)]*\\)|https?://[^\\s]+|[a-z0-9_]+:[a-z0-9_/.-]+");
@@ -39,6 +40,7 @@ public final class TranslationService {
     interface LocalProvider {
         boolean available();
         void maintain();
+        default void maintain(boolean readingScreen){maintain();}
         CompletableFuture<Boolean> start(Path directory);
         CompletableFuture<List<String>> translate(List<String> sources);
         String status();
@@ -52,6 +54,7 @@ public final class TranslationService {
     private volatile LocalProvider provider=new LocalProvider() {
         public boolean available(){return LocalTranslationClient.available();}
         public void maintain(){LocalTranslationClient.maintain();}
+        public void maintain(boolean readingScreen){LocalTranslationClient.maintain(readingScreen);}
         public CompletableFuture<Boolean> start(Path directory){return LocalTranslationClient.start(directory);}
         public CompletableFuture<List<String>> translate(List<String> sources){return LocalTranslationClient.translate(sources);}
         public String status(){return LocalTranslationClient.status();}
@@ -74,7 +77,9 @@ public final class TranslationService {
     private final ConcurrentHashMap<String,ConcurrentHashMap<String,String>> cache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,String> bySource = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String,Job> jobs = new ConcurrentHashMap<>();
-    private final ConcurrentLinkedDeque<String> visible = new ConcurrentLinkedDeque<>(), background = new ConcurrentLinkedDeque<>();
+    private final IndexedWorkDeque visible = new IndexedWorkDeque(), background = new IndexedWorkDeque();
+    // Known interface labels need no model and must not wait for RAM admission.
+    private final IndexedWorkDeque canonicalReady = new IndexedWorkDeque();
     // At most one entry per admitted job; the renderer never traverses this set or the queue.
     private final Set<String> visibleTracking=ConcurrentHashMap.newKeySet();
     private volatile TranslationProgress progressSnapshot=DISABLED_PROGRESS;
@@ -116,7 +121,7 @@ public final class TranslationService {
             atomicWrite(file,GSON.toJson(config));
             LocalTranslationClient.setUserPaused(config.translationPaused);
             instance=new TranslationService(config,directory,ids);
-            LOG.log(System.Logger.Level.INFO,"TraduzMods 1.0.0 {0} automatic worker initialized; {1} cached keys, {2} installed mods.",TranslationEdition.current().id(),instance.cache.size(),ids.size());
+            LOG.log(System.Logger.Level.INFO,"TraduzMods 2.0.0-alpha.1 {0} automatic worker initialized; {1} cached keys, {2} installed mods.",TranslationEdition.current().id(),instance.cache.size(),ids.size());
         } catch(Exception e) { LOG.log(System.Logger.Level.ERROR,"Translation initialization failed.",e); }
     }
     public static boolean isPortugueseActive() { return portugueseActive; }
@@ -307,16 +312,17 @@ public final class TranslationService {
     }
     private void enqueue(String key,String source,boolean priority) {
         if(ModTextPolicy.isModName(source)) return;
-        if(closed||source.length()>config.maxTextCharacters||jobs.size()>=config.maxQueueEntries) return;
+        if(closed||source.length()>config.maxTextCharacters) return;
+        if(jobs.size()>=config.maxQueueEntries&&!jobs.containsKey(source))return;
         Job fresh=new Job(key,source,priority); Job existing=jobs.putIfAbsent(source,fresh);
-        if(existing==null) {queueVersion.incrementAndGet();if(priority) {fresh.lastPromoted=System.currentTimeMillis();visible.addFirst(source);} else background.addLast(source);}
+        if(existing==null) {queueVersion.incrementAndGet();if(priority) {fresh.lastPromoted=System.currentTimeMillis();visible.addFirst(source);} else background.addLast(source);if(ModTextPolicy.canonicalUi(source)!=null)canonicalReady.addLast(source);}
         else if(priority&&!existing.running) {
             // Language lookups during registries/building screens also promote thousands
             // of jobs. Repeated render/hover requests must outrank that startup backlog.
             long now=System.currentTimeMillis();
             if(!existing.priority||now-existing.lastPromoted>=250) {
                 if(!existing.priority)queueVersion.incrementAndGet();existing.priority=true;existing.lastPromoted=now;
-                visible.remove(source);visible.addFirst(source);
+                background.remove(source);visible.addFirst(source);
             }
         }
         if(priority) {
@@ -354,7 +360,7 @@ public final class TranslationService {
             if(provider.status().contains("GPU"))reason="VRAM livre insuficiente";
             else {
                 long free=LocalResourcePolicy.freeMemoryMiB();
-                long required=TranslationEdition.current()==TranslationEdition.NORMAL&&visiblePending>0?LocalResourcePolicy.minimumOnDemandFreeMemoryMiB():LocalResourcePolicy.minimumFreeMemoryMiB(free);
+                long required=visiblePending>0||TranslationEdition.current()==TranslationEdition.NORMAL?LocalTranslationClient.foregroundMinimumFreeMemoryMiB():LocalResourcePolicy.minimumFreeMemoryMiB(free);
                 reason=String.format(Locale.forLanguageTag("pt-BR"),"RAM: %.1f GB livres / mín. %.1f GB",Math.max(0,free)/1024D,required/1024D);
             }
         } else if("waiting".equals(phase))reason="Aguardando o tradutor local";
@@ -364,19 +370,20 @@ public final class TranslationService {
     }
     private void tick() {
         if(config.translationPaused){providerState="paused_by_user";return;}
-        provider.maintain();
         boolean readingScreen=readingScreenProbe.getAsBoolean();
+        provider.maintain(readingScreen);
         if(readingScreen&&activeBatchBackground&&backgroundYieldRequested.compareAndSet(false,true))provider.requestInteractivePriority();
-        if(!readingScreen&&provider.isEconomyMode()&&visibleTracking.isEmpty()&&!busy.get()&&provider.available())provider.stop();
+        if(!readingScreen&&provider.isEconomyMode()&&visibleTracking.isEmpty()&&!busy.get()&&provider.available()
+                &&(TranslationEdition.current()==TranslationEdition.LITE||jobs.isEmpty()))provider.stop();
         if(!readingScreen&&TranslationEdition.current()==TranslationEdition.NORMAL && catalogReady && jobs.isEmpty()
                 && !busy.get() && provider.available())provider.stop();
         if(closed||!portugueseActive||!catalogReady||!config.enabled||System.currentTimeMillis()<retryGlobalUntil||!busy.compareAndSet(false,true)) return;
         // Lite never loads native inference for catalog bulk work, including the main menu.
         // Visible texts promote themselves; Normal advances the catalog while sufficient RAM is available.
         long freeMemory=LocalResourcePolicy.freeMemoryMiB();
-        boolean economyRequested=TranslationEdition.current()==TranslationEdition.NORMAL&&!provider.available()&&!visible.isEmpty()
-                &&!LocalResourcePolicy.canStart(freeMemory)&&LocalResourcePolicy.canStartOnDemand(freeMemory);
-        boolean backgroundAllowed=TranslationEdition.current().allowsBackgroundWhilePlaying()&&!provider.isEconomyMode()&&!economyRequested&&!readingScreen;
+        boolean economyRequested=!provider.available()&&!visible.isEmpty()
+                &&!LocalResourcePolicy.canStart(freeMemory)&&LocalResourcePolicy.canAttemptOnDemand(freeMemory);
+        boolean backgroundAllowed=TranslationEdition.current().allowsBackgroundWhilePlaying()&&!readingScreen;
         if(!backgroundAllowed&&!readingScreen&&System.currentTimeMillis()-lastPrioritySweep>=1000) {
             lastPrioritySweep=System.currentTimeMillis();
             int queued=visible.size();
@@ -392,11 +399,15 @@ public final class TranslationService {
         boolean providerReady=provider.available();
         List<Job> batch=new ArrayList<>(); int limit=provider.isEconomyMode()||!visible.isEmpty()?1:TranslationEdition.current().localBatchSize(); int characters=0;
         // Bound queue scans even when the provider is ready: retried catalogs must not monopolize the worker.
-        int attempts=Math.min(providerReady?512:128,Math.max(visible.size()+background.size(),1));
+        int attempts=Math.min(providerReady?512:128,Math.max(visible.size()+background.size()+canonicalReady.size(),1));
         Map<String,Job> deferred=new LinkedHashMap<>();
         try {
           while(batch.size()<limit&&attempts-->0) {
-            String id=visible.pollFirst(); if(id==null&&backgroundAllowed) id=background.pollFirst(); if(id==null) break;
+            String id=visible.pollFirst();
+            if(id==null)id=canonicalReady.pollFirst();
+            if(id==null&&backgroundAllowed)id=background.pollFirst();
+            if(id==null)break;
+            if(canonicalReady.remove(id)||ModTextPolicy.canonicalUi(id)!=null) {visible.remove(id);background.remove(id);}
             Job job=jobs.get(id); if(job==null||job.running) continue;
             if(deferred.containsKey(id))continue;
             // Reinsert ineligible jobs only after this pass. A visible retry must not hide the entire catalog.
@@ -445,7 +456,7 @@ public final class TranslationService {
             if(output==null||output.isBlank()||!tokensValid(job.source,output)){retry(job);lastFailure="invalid_translation_tokens";continue;}
             accepted.add(job);rows.add(new CacheRecord(job.key,job.source,output,TRANSLATION_QUALITY_VERSION));
         }
-        Gson compact=new Gson();CacheJournal.append(directory.resolve("translations.journal.jsonl"),rows.stream().map(compact::toJson).toList());
+        CacheJournal.append(directory.resolve("translations.journal.jsonl"),rows.stream().map(CACHE_JSON::toJson).toList());
         for(int i=0;i<rows.size();i++) {
             CacheRecord row=rows.get(i);Job job=accepted.get(i);
             cache.computeIfAbsent(row.key,k->new ConcurrentHashMap<>()).put(row.source,row.translated);bySource.put(row.source,row.translated);translatedTexts.add(row.translated);
@@ -519,14 +530,16 @@ public final class TranslationService {
     private void persistSafely(){persist(true);}
     private synchronized void persist(boolean force) {
         try {
-            long now=System.currentTimeMillis();boolean checkpoint=force||(cacheDirty&&now-lastCheckpoint>=60_000);
+            // Every result is already durable in the journal. Consolidation can wait
+            // while the player is waiting for a visible text; shutdown always flushes.
+            long now=System.currentTimeMillis();boolean checkpoint=force||(cacheDirty&&now-lastCheckpoint>=60_000&&visibleTracking.isEmpty());
             if(checkpoint) {
                 List<CacheRecord> rows=new ArrayList<>();cache.forEach((key,values)->values.forEach((source,value)->rows.add(new CacheRecord(key,source,value,TRANSLATION_QUALITY_VERSION))));rows.sort(Comparator.comparing(CacheRecord::key).thenComparing(CacheRecord::source));
-                atomicWrite(directory.resolve("translations.json"),GSON.toJson(rows));CacheJournal.clear(directory.resolve("translations.journal.jsonl"));cacheDirty=false;lastCheckpoint=now;
+                atomicWrite(directory.resolve("translations.json"),CACHE_JSON.toJson(rows));CacheJournal.clear(directory.resolve("translations.journal.jsonl"));cacheDirty=false;lastCheckpoint=now;
             }
             long queued=queueVersion.get();
-            if(force||checkpoint||(queued!=savedQueueVersion&&now-lastQueueSnapshot>=10_000)){atomicWrite(directory.resolve("pending.json"),GSON.toJson(jobs.values()));savedQueueVersion=queued;lastQueueSnapshot=now;}
-            JsonObject status=new JsonObject(); status.addProperty("version","1.0.0");status.addProperty("translationEngine","local-hy-mt2");status.addProperty("economyOnDemand",provider.isEconomyMode());status.addProperty("ptBrActive",portugueseActive);status.addProperty("installedMods",modIds.size());status.addProperty("discoveredMissing",discovered);status.addProperty("cachedUniqueSources",bySource.size());status.addProperty("pending",jobs.size());status.addProperty("translatedThisRun",commits);status.addProperty("provider",providerState);status.addProperty("local",provider.status());status.addProperty("lastFailure",lastFailure);status.addProperty("updatedAt",java.time.Instant.now().toString());
+            if(force||checkpoint||(queued!=savedQueueVersion&&now-lastQueueSnapshot>=10_000&&visibleTracking.isEmpty())){atomicWrite(directory.resolve("pending.json"),CACHE_JSON.toJson(jobs.values()));savedQueueVersion=queued;lastQueueSnapshot=now;}
+            JsonObject status=new JsonObject(); status.addProperty("version","2.0.0-alpha.1");status.addProperty("paragraphReuseHits",LocalTranslationClient.paragraphReuseCount());status.addProperty("translationEngine","local-hy-mt2");status.addProperty("economyOnDemand",provider.isEconomyMode());status.addProperty("ptBrActive",portugueseActive);status.addProperty("installedMods",modIds.size());status.addProperty("discoveredMissing",discovered);status.addProperty("cachedUniqueSources",bySource.size());status.addProperty("pending",jobs.size());status.addProperty("translatedThisRun",commits);status.addProperty("provider",providerState);status.addProperty("local",provider.status());status.addProperty("lastFailure",lastFailure);status.addProperty("updatedAt",java.time.Instant.now().toString());
             status.addProperty("translationQualityVersion",TRANSLATION_QUALITY_VERSION);status.addProperty("nativeTerminologyEntries",GameTranslationContext.nativeTermCount());
             status.addProperty("storageMode","journal");status.addProperty("localBackend",LocalTranslationClient.backend());status.addProperty("lastTranslationMs",lastTranslationMs);status.addProperty("lastCheckpointMillis",lastCheckpoint);
             status.addProperty("localMemoryBudgetMiB",LocalResourcePolicy.currentMemoryBudgetMiB());status.addProperty("localIdleUnloadSeconds",LocalResourcePolicy.IDLE_MILLIS/1000);status.addProperty("pretranslateWhilePlaying",TranslationEdition.current().allowsBackgroundWhilePlaying());
@@ -549,7 +562,7 @@ public final class TranslationService {
         try{Files.move(temp,path,StandardCopyOption.REPLACE_EXISTING,StandardCopyOption.ATOMIC_MOVE);}catch(AtomicMoveNotSupportedException e){Files.move(temp,path,StandardCopyOption.REPLACE_EXISTING);}
     }
     private record CacheRecord(String key,String source,String translated,int qualityVersion){}
-    private static final class Job {String key,source;volatile boolean priority;boolean forceLocal;transient boolean running;transient long lastPromoted;long retryAt;int failures;Job(String key,String source,boolean priority){this.key=key;this.source=source;this.priority=priority;}}
+    private static final class Job {String key,source;volatile boolean priority;boolean forceLocal;transient volatile boolean running;transient volatile long lastPromoted;long retryAt;int failures;Job(String key,String source,boolean priority){this.key=key;this.source=source;this.priority=priority;}}
     private static final class Config {
         volatile boolean translationPaused=false;
         volatile boolean displayCachedTranslations=true;
