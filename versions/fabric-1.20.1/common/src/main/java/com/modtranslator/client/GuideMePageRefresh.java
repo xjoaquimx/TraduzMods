@@ -78,11 +78,18 @@ public final class GuideMePageRefresh {
             if (leaves.isEmpty()) return false;
             Block block = BLOCKS.get(node);
             if (block == null || !block.matches(leaves)) { block = new Block(leaves); BLOCKS.put(node, block); }
-            String translated = TranslationService.translateModDocument(null, block.encoded);
-            List<StyledTextCodec.Span> spans = StyledTextCodec.decode(translated, leaves.size());
-            if (spans == null) return false;
-            // A fixed flow tree cannot reorder its link/style nodes. Reject a reordered protocol result.
-            for (int i = 0; i < spans.size(); i++) if (spans.get(i).index() != i) return false;
+            List<StyledTextCodec.Span> spans;
+            if (block.fallback) spans = fragments(block.originals);
+            else {
+                String translated = TranslationService.translateModDocument(null, block.encoded);
+                spans = StyledTextCodec.decode(translated, leaves.size());
+                if (!usable(spans, block.originals)) {
+                    // Models can preserve every XML tag yet move link words into prose and empty their tags.
+                    // Translate original leaves instead of accepting that broken link mapping or freezing forever.
+                    block.fallback = true;
+                    spans = fragments(block.originals);
+                }
+            }
             boolean changed = false;
             for (StyledTextCodec.Span span : spans) {
                 Object leaf = leaves.get(span.index()); NodeAccess text = NODES.get(leaf.getClass());
@@ -95,6 +102,28 @@ public final class GuideMePageRefresh {
         boolean changed = false;
         if (access.children != null) for (Object child : (Iterable<?>) access.children.invoke(node)) changed |= update(child, depth + 1);
         return changed;
+    }
+    private static boolean usable(List<StyledTextCodec.Span> spans, List<String> originals) {
+        if (spans == null || spans.size() != originals.size()) return false;
+        for (int i = 0; i < spans.size(); i++)
+            if (spans.get(i).index() != i || (!originals.get(i).isBlank() && spans.get(i).text().isBlank())) return false;
+        return true;
+    }
+    private static List<StyledTextCodec.Span> fragments(List<String> originals) {
+        List<StyledTextCodec.Span> spans = new ArrayList<>(originals.size());
+        // The visible queue is LIFO: submit the first readable prose last so it is served first.
+        for (int i = originals.size() - 1; i >= 0; i--) {
+            String source = originals.get(i), body = source.strip();
+            String translated = TranslationService.translateModDocumentFragment(body);
+            if (!Objects.equals(body, translated)) {
+                int start = 0, end = source.length();
+                while (start < end && Character.isWhitespace(source.charAt(start))) start++;
+                while (end > start && Character.isWhitespace(source.charAt(end - 1))) end--;
+                translated = source.substring(0, start) + translated.strip() + source.substring(end);
+            } else translated = source;
+            spans.add(0, new StyledTextCodec.Span(i, translated));
+        }
+        return spans;
     }
     private static void collect(Object node, List<Object> leaves, int depth) throws ReflectiveOperationException {
         if (node == null || depth > 64) return;
@@ -150,6 +179,7 @@ public final class GuideMePageRefresh {
         final List<String> originals = new ArrayList<>();
         final List<WeakReference<Object>> leaves = new ArrayList<>();
         final String encoded;
+        boolean fallback;
         Block(List<Object> objects) throws ReflectiveOperationException {
             for (Object leaf : objects) { leaves.add(new WeakReference<>(leaf)); originals.add((String) NODES.get(leaf.getClass()).text.invoke(leaf)); }
             encoded = StyledTextCodec.encode(originals);

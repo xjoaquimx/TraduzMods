@@ -57,6 +57,29 @@ public final class GuideMeApiIntegration {
             TranslationService.setCachedTranslationDisplayEnabled(false);
             TranslationServiceIntegrationTest.await(()->{GuideMePageRefresh.refresh(screen);return text(body).startsWith("The Charger")&&text(title).equals("The Charger")&&text(nav).equals("Getting Started");},"real GuideMe original text not restored");
             System.out.println("PASS real GuideMe 26.1.15-beta: body, heading, detached title, sidebar, non-text block, styles, scroll, cache toggle");
+            TranslationService.setCachedTranslationDisplayEnabled(true);
+            mock.translation=s->s.replace("Equal distribution cards can be applied to","Cartões de distribuição igualitária podem ser aplicados a")
+                .replace("storage cells","células de armazenamento").replace("They split the cell","Eles dividem a célula");
+            Object fragmentDoc=type("block.LytDocument").getConstructor().newInstance();
+            Object paragraph=type("block.LytParagraph").getConstructor().newInstance();
+            List<String> originals=List.of("Equal distribution cards can be applied to ","storage cells",". They split the cell.");
+            Object left=type("flow.LytFlowText").getMethod("of",String.class).invoke(null,originals.get(0));
+            Object linked=type("flow.LytFlowText").getMethod("of",String.class).invoke(null,originals.get(1));
+            Object right=type("flow.LytFlowText").getMethod("of",String.class).invoke(null,originals.get(2));
+            Object span=type("flow.LytFlowSpan").getConstructor().newInstance();
+            span.getClass().getMethod("append",type("flow.LytFlowContent")).invoke(span,linked);
+            Object spanStyle=span.getClass().getMethod("getStyle").invoke(span);
+            Method appendFlow=paragraph.getClass().getMethod("append",type("flow.LytFlowContent"));
+            appendFlow.invoke(paragraph,left);appendFlow.invoke(paragraph,span);appendFlow.invoke(paragraph,right);append.invoke(fragmentDoc,paragraph);
+            @SuppressWarnings("unchecked") Map<String,String> cache=(Map<String,String>)TranslationServiceIntegrationTest.value(TranslationServiceIntegrationTest.service(),"bySource");
+            cache.put(com.modtranslator.client.StyledTextCodec.encode(originals),"<mt0>Cartões podem ser aplicados às células</mt0><mt2>. Eles dividem a célula.</mt2><mt1></mt1>");
+            Screen fragmentScreen=new Screen(fragmentDoc,paragraph("The Charger"));
+            TranslationServiceIntegrationTest.await(()->{GuideMePageRefresh.refresh(fragmentScreen);return text(paragraph).equals("Cartões de distribuição igualitária podem ser aplicados a células de armazenamento. Eles dividem a célula.");},"real flow cached collapsed output never fell back");
+            TranslationServiceIntegrationTest.check(((List<?>)span.getClass().getMethod("getChildren").invoke(span)).get(0)==linked
+                &&spanStyle==span.getClass().getMethod("getStyle").invoke(span)&&fragmentScreen.scroll==130,"real fallback replaced nested span/style or scroll");
+            TranslationService.setCachedTranslationDisplayEnabled(false);
+            TranslationServiceIntegrationTest.await(()->{GuideMePageRefresh.refresh(fragmentScreen);return text(paragraph).equals(String.join("",originals));},"real fallback did not restore original text");
+            System.out.println("PASS real GuideMe collapsed XML fallback: nested spans, whitespace, original restoration, layout invalidation");
         } finally {TranslationServiceIntegrationTest.closeService();}
     }
 }

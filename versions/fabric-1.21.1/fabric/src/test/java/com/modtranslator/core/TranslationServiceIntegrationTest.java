@@ -1519,6 +1519,48 @@ class TranslationServiceIntegrationTest {
             }
         });
 
+        test("GuideMe_cached_reordered_empty_card_links_fall_back_and_persist_without_losing_styles",()->{
+            try(Mock mock=new Mock()) {
+                Path dir=init("guide-card-fallback",mock,true);
+                scan(Map.of(),Map.of("item.testmod.cell_workbench","Bancada de Células"),Map.of());
+                List<String> originals=List.of("Overflow destruction cards can be applied to ","storage cells"," in a ","Bancada de Células","\nand will delete incoming items if the cell is full. (make sure to ","partition"," your cells!)");
+                String encoded=StyledTextCodec.encode(originals);
+                @SuppressWarnings("unchecked") Map<String,String> cache=(Map<String,String>)value(service(),"bySource");
+                cache.put(encoded,"<mt0>Cartões podem ser aplicados a células em uma </mt0><mt3>Bancada de Células</mt3><mt4> e excluem os itens.</mt4><mt1></mt1><mt2></mt2><mt5></mt5><mt6></mt6>");
+                mock.translation=source->source.replace("Overflow destruction cards can be applied to","Cartões de destruição de sobras podem ser aplicados a")
+                    .replace("storage cells","células de armazenamento").replace("in a","em uma").replace("partition","particionar")
+                    .replace("and will delete incoming items if the cell is full. (make sure to","e excluirão os itens recebidos se a célula estiver cheia. (lembre-se de")
+                    .replace("your cells!)","suas células!)");
+                FakeGuideScreen view=new FakeGuideScreen();List<FakeGuideText> leaves=originals.stream().map(FakeGuideText::new).toList();
+                FakeGuideSpan storageLink=new FakeGuideSpan(List.of(leaves.get(1))), nativeLink=new FakeGuideSpan(List.of(leaves.get(3))), partitionLink=new FakeGuideSpan(List.of(leaves.get(5)));
+                Object style=storageLink.style;
+                view.document.blocks.add(new FakeGuideParagraph(List.of(leaves.get(0),storageLink,leaves.get(2),nativeLink,leaves.get(4),partitionLink,leaves.get(6))));
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return leaves.get(0).text.startsWith("Cartões")&&leaves.get(1).text.equals("células de armazenamento")&&leaves.get(5).text.equals("particionar")&&leaves.get(4).text.startsWith("\ne excluirão");},"collapsed card paragraph remained in English");
+                check(leaves.get(0).text.endsWith(" ")&&leaves.get(2).text.equals(" em uma ")&&leaves.get(4).text.endsWith(" ")&&leaves.get(6).text.startsWith(" "),"fallback joined adjacent link words or lost newline/whitespace");
+                check(storageLink.style==style&&storageLink.children.get(0)==leaves.get(1)&&nativeLink.children.get(0)==leaves.get(3)&&view.scrollY==130&&view.documentLayoutInvalid,"fallback replaced link nodes/style or scroll");
+                check(leaves.get(3).text.equals("Bancada de Células")&&mock.sent.stream().noneMatch(x->x.contains("Bancada de Células")),"native item label was retransmitted");
+                invoke(service(),"persistSafely");String disk=Files.readString(dir.resolve("translations.json"));check(disk.contains("células de armazenamento")&&disk.contains("particionar"),"fragment translations not stored on disk");
+                int requests=mock.sent.size();
+                TranslationService.setCachedTranslationDisplayEnabled(false);
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return leaves.get(0).text.equals(originals.get(0))&&leaves.get(5).text.equals(originals.get(5));},"fallback failed to restore original card text");
+                TranslationService.setCachedTranslationDisplayEnabled(true);
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return leaves.get(0).text.startsWith("Cartões")&&leaves.get(5).text.equals("particionar");},"fallback cache did not reapply");
+                check(mock.sent.size()==requests,"re-enabling cached fallback repeated inference");
+            }
+        });
+        test("GuideMe_ordered_XML_with_empty_nonempty_link_uses_original_fragment_fallback",()->{
+            try(Mock mock=new Mock()) {
+                init("guide-empty-link",mock,true);scan(Map.of(),Map.of(),Map.of());
+                List<String> originals=List.of("Equal distribution cards can be applied to ","storage cells",". They split the cell.");
+                @SuppressWarnings("unchecked") Map<String,String> cache=(Map<String,String>)value(service(),"bySource");
+                cache.put(StyledTextCodec.encode(originals),"<mt0>Cartões são aplicados às células de armazenamento</mt0><mt1></mt1><mt2>. Eles dividem a célula.</mt2>");
+                mock.translation=x->x.replace("Equal distribution cards can be applied to","Cartões de distribuição igualitária podem ser aplicados a").replace("storage cells","células de armazenamento").replace("They split the cell","Eles dividem a célula");
+                FakeGuideScreen view=new FakeGuideScreen();FakeGuideText left=new FakeGuideText(originals.get(0)),link=new FakeGuideText(originals.get(1)),right=new FakeGuideText(originals.get(2));
+                view.document.blocks.add(new FakeGuideParagraph(List.of(left,new FakeGuideSpan(List.of(link)),right)));
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return left.text.startsWith("Cartões de distribuição")&&link.text.equals("células de armazenamento")&&right.text.equals(". Eles dividem a célula.");},"ordered XML erased link instead of using fallback");
+            }
+        });
+
         JsonObject summary=new JsonObject();summary.addProperty("passed",passed);summary.addProperty("failed",failures.size());summary.add("failures",GSON.toJsonTree(failures));
         Files.writeString(root.resolve("results.json"),new GsonBuilder().setPrettyPrinting().create().toJson(summary));
         System.out.println("RESULT "+summary);if(!failures.isEmpty())System.exit(1);
