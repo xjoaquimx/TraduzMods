@@ -1,0 +1,37 @@
+plugins {
+    id 'net.fabricmc.fabric-loom-remap' version '1.18-SNAPSHOT'
+}
+version = project.mod_version
+group = project.mod_group
+base { archivesName = 'traduzmods-fabric' }
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+    modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+sourceSets.main.java.srcDir('../common/src/main/java')
+loom { mixin { useLegacyMixinAp = true; defaultRefmapName = 'modtranslator.refmap.json' } }
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') { expand 'version': project.version }
+}
+tasks.withType(JavaCompile).configureEach { options.release = 17 }
+java { sourceCompatibility = JavaVersion.VERSION_17; targetCompatibility = JavaVersion.VERSION_17; withSourcesJar() }
+jar { from('../LICENSE') }
+
+tasks.test { enabled = false } // Integration suite has a standalone main runner.
+tasks.register('integrationTest', JavaExec) { dependsOn testClasses; classpath = sourceSets.test.runtimeClasspath; mainClass = 'com.modtranslator.core.TranslationServiceIntegrationTest'; args layout.buildDirectory.dir('integration-'+System.currentTimeMillis()).get().asFile.absolutePath; javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }; environment 'DEEPL_AUTH_KEY', '' }
+tasks.register('localMemorySmoke', JavaExec) { dependsOn testClasses; classpath = sourceSets.test.runtimeClasspath; mainClass = 'com.modtranslator.core.LocalMemorySmoke'; args '../validation/memory-profile', '../validation/memory-translations.json'; javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }; environment 'DEEPL_AUTH_KEY', ''; systemProperty 'traduzmods.local.port', '18779' }
+tasks.register('localGuardSmoke', JavaExec) { dependsOn testClasses; classpath = sourceSets.test.runtimeClasspath; mainClass = 'com.modtranslator.core.LocalGuardSmoke'; args '../validation/memory-profile'; javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }; environment 'DEEPL_AUTH_KEY', ''; systemProperty 'traduzmods.local.port', '18779'; systemProperty 'traduzmods.local.maxMemoryMiB', '768' }
+
+// Both editions use the same production code and mod ID. Build one edition at a time.
+def translationEdition = providers.gradleProperty('edition').getOrElse('lite')
+if (!(translationEdition in ['lite', 'normal'])) { throw new GradleException('edition must be lite or normal') }
+processResources {
+    inputs.property 'edition', translationEdition
+    filesMatching('traduzmods-edition.properties') {
+        filter { line -> 'edition=' + translationEdition }
+    }
+}
+
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

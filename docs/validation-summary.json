@@ -1,0 +1,177 @@
+{
+  "version": "1.0.0",
+  "integrationPassed": 450,
+  "integrationFailed": 0,
+  "integrationProfiles": [
+    {
+      "passed": 75,
+      "failed": 0,
+      "profile": "fabric120-lite"
+    },
+    {
+      "passed": 75,
+      "failed": 0,
+      "profile": "fabric120-normal"
+    },
+    {
+      "passed": 75,
+      "failed": 0,
+      "profile": "test-fabric26-030-lite"
+    },
+    {
+      "passed": 75,
+      "failed": 0,
+      "profile": "test-fabric26-030-normal"
+    },
+    {
+      "passed": 75,
+      "failed": 0,
+      "profile": "test-neoforge030-lite"
+    },
+    {
+      "passed": 75,
+      "failed": 0,
+      "profile": "test-neoforge030-normal"
+    }
+  ],
+  "releaseJarChecks": 18,
+  "hudActualJarChecks": 6,
+  "sharedClassesParity": true,
+  "finalClassesIdenticalToStructurallyCheckedStage": true,
+  "productionJavaSourceArchiveMatchesStage": 135,
+  "fixedRestartCooldownRemoved": true,
+  "remoteTranslationAbsent": true,
+  "releases": [
+    {
+      "loader": "fabric",
+      "minecraft": "1.20.1",
+      "edition": "lite",
+      "version": "1.0.0-lite",
+      "file": "traduzmods-fabric-1.0.0-lite-mc1.20.1.jar",
+      "bytes": 178521,
+      "sha256": "505b3df954b1d5ed65cfb05972d13f618a66055ebe340d500486714e15c1d699",
+      "classes_sha256": "8e046865495e401eca2437d7ef6367b757a5f60d0d579005a28b6cfcfa8c2fa2"
+    },
+    {
+      "loader": "fabric",
+      "minecraft": "1.20.1",
+      "edition": "normal",
+      "version": "1.0.0-normal",
+      "file": "traduzmods-fabric-1.0.0-normal-mc1.20.1.jar",
+      "bytes": 178538,
+      "sha256": "b9f7263443f3cc2d73a1e69c972024a96c7c1e094ee24ef31bd8da7000f68560",
+      "classes_sha256": "8e046865495e401eca2437d7ef6367b757a5f60d0d579005a28b6cfcfa8c2fa2"
+    },
+    {
+      "loader": "fabric",
+      "minecraft": "26.2",
+      "edition": "lite",
+      "version": "1.0.0-lite",
+      "file": "traduzmods-fabric-1.0.0-lite-mc26.2.jar",
+      "bytes": 157986,
+      "sha256": "fef6ce4979cdedf8622d9147b142e6670a59e3c24ce7d8f83077c36b5ce398ca",
+      "classes_sha256": "900d5d224706c04f1026892b0b3c4645ea977d9c79f1332d29bae64b304e1609"
+    },
+    {
+      "loader": "fabric",
+      "minecraft": "26.2",
+      "edition": "normal",
+      "version": "1.0.0-normal",
+      "file": "traduzmods-fabric-1.0.0-normal-mc26.2.jar",
+      "bytes": 158003,
+      "sha256": "d08e582d3cbccad2a968cf9d79d412b84fe3eced9bea416a51e239c48a0334dd",
+      "classes_sha256": "900d5d224706c04f1026892b0b3c4645ea977d9c79f1332d29bae64b304e1609"
+    },
+    {
+      "loader": "neoforge",
+      "minecraft": "26.1.2",
+      "edition": "lite",
+      "version": "1.0.0-lite",
+      "file": "traduzmods-neoforge-1.0.0-lite-mc26.1.2.jar",
+      "bytes": 158596,
+      "sha256": "ebd46686cfa2da009afa93c28cc3058392beecb5791476863002598772e4e55f",
+      "classes_sha256": "8fde30bd08750466015fddab0243cd55d0136aa412551835c6facc4836a10325"
+    },
+    {
+      "loader": "neoforge",
+      "minecraft": "26.1.2",
+      "edition": "normal",
+      "version": "1.0.0-normal",
+      "file": "traduzmods-neoforge-1.0.0-normal-mc26.1.2.jar",
+      "bytes": 158600,
+      "sha256": "34f417850c4a8104cb6c28f0da6861a0bc02c70116883796f43bdbb9a02bcf84",
+      "classes_sha256": "8fde30bd08750466015fddab0243cd55d0136aa412551835c6facc4836a10325"
+    }
+  ],
+  "nativeProbe": {
+    "edition": "normal",
+    "freeBeforeMiB": 8385,
+    "onDemandProfile": true,
+    "startupMs": 4922,
+    "backend": "cpu",
+    "activeMemoryBudgetMiB": 1792,
+    "activePlan": {
+      "threads": 2,
+      "contextTokens": 1024,
+      "batchTokens": 64,
+      "microBatchTokens": 32,
+      "gpuEligible": false,
+      "worldLoaded": false
+    },
+    "hardware": {
+      "totalMemoryMiB": 16294,
+      "freeMemoryMiB": 8383,
+      "logicalThreads": 12,
+      "gpuFreeMiB": -1,
+      "gpuTotalMiB": -1,
+      "gpuDriverMajor": 0
+    },
+    "longQuestElapsedMs": 9079,
+    "longQuestTranslation": "Com sua Picareta de madeira, você pode minerar pedra para obter pedra-silício. Isso permite que você criar ferramentas de pedra e minerar mais blocos. Você também pode criar um forno para fundir itens. Os fornos precisam de combustível: madeira, carvão e até mesmo palitos funcionam. Lembre-se de reunir bastante pedra-silício para fazer um forno, uma espada e uma picareta. uma machada. Segure o botão esquerdo do mouse para minerar blocos. Ferramentas melhores permitem que você minerize materiais mais fortes.",
+    "backgroundYieldPassed": true,
+    "backgroundYieldMs": 6916,
+    "visibleTextAfterYieldMs": 7840,
+    "visibleTextAfterYieldTranslation": "Como posso ajudar?",
+    "translationTotalMs": 480,
+    "translations": [
+      {
+        "source": "What can I help with?",
+        "translated": "Como posso ajudar?",
+        "batchElapsedMs": 478,
+        "batchSize": 1
+      }
+    ],
+    "idleRetested": false,
+    "pausedStartupRejected": true,
+    "pauseReleasedOwnedProcess": true,
+    "resumeNativeInferencePassed": true,
+    "resumedTranslation": "Você pode minerar pedra com uma Picareta de madeira.",
+    "passed": true,
+    "shippedJar": "traduzmods-fabric-1.0.0-normal-mc1.20.1.jar",
+    "shippedJarSha256": "b9f7263443f3cc2d73a1e69c972024a96c7c1e094ee24ef31bd8da7000f68560",
+    "nativeClientClassSha256": "41a991b4ed7c00ffcaa288f6d931489be1d92fbd935417a7fea13266ce5a356b"
+  },
+  "nativeMemory": {
+    "samples": 59,
+    "maxWorkingMiB": 1547.16,
+    "maxPrivateMiB": 794.14
+  },
+  "limitations": [
+    "Not a live FPS benchmark or visual test of all six game builds.",
+    "Native CPU compact profile measured in isolation; linguistic quality outside the installed game glossary is not comprehensively validated.",
+    "Current background chunk completes before foreground takes over; no instantaneous translation guarantee."
+  ],
+  "repositoryPreparation": {
+    "gradleBuildsPassed": [
+      "fabric-1.20.1-normal",
+      "fabric-26.2-normal",
+      "neoforge-26.1.2-normal"
+    ],
+    "integrationPassed": 225,
+    "integrationFailed": 0,
+    "sharedCoreComparisons": 30,
+    "releaseJarHashesVerified": 6,
+    "productionJavaFilesWithIdenticalCode": 130,
+    "lineEndingsNormalizedByGit": true
+  }
+}

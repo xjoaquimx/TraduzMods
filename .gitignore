@@ -1,0 +1,24 @@
+# Build and editor output
+**/build/
+**/.gradle/
+**/run/
+**/dist/
+**/validation/
+.idea/
+.vscode/
+*.iml
+__pycache__/
+*.pyc
+# Personal configuration, worlds, credentials and translation caches
+**/config/
+**/logs/
+**/crash-reports/
+**/saves/
+.env
+.env.*
+*.log
+# Model and native inference runtime are downloaded locally
+*.gguf
+*.exe
+*.dll
+*.pdb

@@ -1,0 +1,25 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "com.modtranslator.mixin",
+  "client": [
+    "LanguageMixin",
+    "ClientLanguageMixin",
+    "TranslatableContentsMixin",
+    "MutableComponentMixin",
+    "GuiGraphicsMixin",
+    "GuiTextCollectorMixin",
+    "FontMixin",
+    "FtbQuestObjectMixin",
+    "FtbQuestMixin",
+    "FtbQuestViewMixin",
+    "NpcChatRefreshMixin",
+    "FancyMenuTextMixin",
+    "TranslationProgressGuiMixin",
+    "TranslationProgressMouseMixin"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "plugin": "com.modtranslator.client.ModTranslatorMixinPlugin"
+}

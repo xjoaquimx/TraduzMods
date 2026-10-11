@@ -1,0 +1,6 @@
+505b3df954b1d5ed65cfb05972d13f618a66055ebe340d500486714e15c1d699  traduzmods-fabric-1.0.0-lite-mc1.20.1.jar
+b9f7263443f3cc2d73a1e69c972024a96c7c1e094ee24ef31bd8da7000f68560  traduzmods-fabric-1.0.0-normal-mc1.20.1.jar
+fef6ce4979cdedf8622d9147b142e6670a59e3c24ce7d8f83077c36b5ce398ca  traduzmods-fabric-1.0.0-lite-mc26.2.jar
+d08e582d3cbccad2a968cf9d79d412b84fe3eced9bea416a51e239c48a0334dd  traduzmods-fabric-1.0.0-normal-mc26.2.jar
+ebd46686cfa2da009afa93c28cc3058392beecb5791476863002598772e4e55f  traduzmods-neoforge-1.0.0-lite-mc26.1.2.jar
+34f417850c4a8104cb6c28f0da6861a0bc02c70116883796f43bdbb9a02bcf84  traduzmods-neoforge-1.0.0-normal-mc26.1.2.jar

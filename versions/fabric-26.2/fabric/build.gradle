@@ -1,0 +1,69 @@
+plugins {
+    id 'net.fabricmc.fabric-loom' version "${loom_version}"
+}
+
+version = project.mod_version
+group = project.mod_group
+
+base {
+    archivesName = 'traduzmods-fabric'
+}
+
+repositories {}
+
+dependencies {
+    minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    implementation "net.fabricmc:fabric-loader:${project.loader_version}"
+}
+
+sourceSets.main.java.srcDir('../common/src/main/java')
+
+loom {
+    mods {
+        "modtranslator" {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+processResources {
+    inputs.property 'version', project.version
+    filesMatching('fabric.mod.json') {
+        expand 'version': project.version
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.release = 25
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_25
+    targetCompatibility = JavaVersion.VERSION_25
+    withSourcesJar()
+}
+
+jar {
+    from('../LICENSE')
+}
+
+// Both editions use the same production code and mod ID. Build one edition at a time.
+def translationEdition = providers.gradleProperty('edition').getOrElse('lite')
+if (!(translationEdition in ['lite', 'normal'])) { throw new GradleException('edition must be lite or normal') }
+processResources {
+    inputs.property 'edition', translationEdition
+    filesMatching('traduzmods-edition.properties') {
+        filter { line -> 'edition=' + translationEdition }
+    }
+}
+
+// Standalone integration runner; no external translation service is used.
+tasks.test { enabled = false }
+tasks.register('integrationTest', JavaExec) {
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    mainClass = 'com.modtranslator.core.TranslationServiceIntegrationTest'
+    args layout.buildDirectory.dir('integration-' + System.currentTimeMillis()).get().asFile.absolutePath
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+}
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }

@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "modtranslator",
+  "version": "${version}",
+  "name": "TraduzMods",
+  "description": "Traduz textos de mods durante o uso e salva as traduções localmente.",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "com.modtranslator.fabric.ModTranslatorFabric"
+    ]
+  },
+  "mixins": [
+    "modtranslator.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": "~1.20.1",
+    "java": ">=17"
+  }
+}
