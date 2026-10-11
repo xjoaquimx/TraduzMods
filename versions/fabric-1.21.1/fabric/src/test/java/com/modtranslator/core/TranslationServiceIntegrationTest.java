@@ -16,6 +16,39 @@ import java.util.function.BooleanSupplier;
 
 /** Isolated integration tests. Production service with an injected in-memory local provider and resource packs. */
 class TranslationServiceIntegrationTest {
+    static final class FakeGuideText {
+        String text; FakeGuideText(String text){this.text=text;}
+        public String getText(){return text;} public void setText(String text){this.text=text;}
+    }
+    static final class FakeGuideSpan {
+        final Object style=new Object();final List<FakeGuideText> children;
+        FakeGuideSpan(List<FakeGuideText> children){this.children=children;}
+        public List<FakeGuideText> getChildren(){return children;}
+    }
+    static final class FakeGuideParagraph {
+        final List<?> content;FakeGuideParagraph(List<?> content){this.content=content;}
+        public Iterable<?> getContent(){return content;}
+    }
+    static final class FakeGuideDocument {
+        final List<FakeGuideParagraph> blocks=new ArrayList<>();int invalidations;
+        public List<FakeGuideParagraph> getChildren(){return blocks;}
+        public void invalidateLayout(){invalidations++;}
+    }
+    static final class FakeGuideScreen {
+        final FakeGuideDocument document=new FakeGuideDocument();
+        boolean documentLayoutInvalid;int scrollY=130;
+        protected FakeGuideDocument getDocument(){return document;}
+    }
+    static final class FakeAetherPages {
+        private final Map<Integer,List<net.minecraft.network.chat.Component>> pages=new HashMap<>();
+        private int currentPageNumber;
+        String visible="";int color;
+        private void createPages(net.minecraft.network.chat.Component source) {
+            visible=source.getString();color=source.getStyle().getColor()==null?0:source.getStyle().getColor().getValue();
+            String[] blocks=visible.split("\\n\\n");
+            for(int i=0;i<blocks.length;i++)pages.put(i,List.of(net.minecraft.network.chat.Component.literal(blocks[i])));
+        }
+    }
     static final Gson GSON = new Gson();
     static final List<String> failures = new ArrayList<>();
     static Path root;
@@ -975,6 +1008,124 @@ class TranslationServiceIntegrationTest {
                 check(translated("npc.vaaz.trainer.name","Radin of the Side Rail").equals("Radin of the Side Rail"),"NPC name changed");
                 check(ModTextPolicy.canonicalUi("Armory").equals("Arsenal"),"location remains English");
             }
+        });
+        test("JourneyMap_identical_English_pt_br_is_missing_but_native_and_brands_win",()->{
+            ModTextPolicy.registerModNames(List.of("JourneyMap"));
+            try(Mock mock=new Mock()) {
+                init("jm-English",mock,false);
+                scan(Map.of("jm.server.admin","Server Admin","jm.cave","Cave Layers","jm.native","Open Map","jm.brand","JourneyMap"),Map.of("jm.server.admin","Server Admin","jm.cave","Cave Layers","jm.native","Abrir mapa","jm.brand","JourneyMap"),Map.of());
+                await(()->translated("jm.server.admin","Server Admin").equals("Administração do servidor")&&translated("jm.cave","Cave Layers").equals("Camadas de cavernas"),"English JourneyMap locale treated as native");
+                check(translated("jm.native","Open Map").equals("Abrir mapa"),"real native override changed");
+                check(translated("jm.brand","JourneyMap").equals("JourneyMap"),"JourneyMap identity changed");
+                check(mock.sent.isEmpty(),"canonical UI waited for a model");
+            } finally {ModTextPolicy.registerModNames(List.of());}
+        });
+        test("JourneyMap_dynamic_dimension_ID_and_vertical_index_stay_intact",()->{
+            try(Mock mock=new Mock()) {
+                init("jm-dynamic",mock,false);scan(Map.of(),Map.of(),Map.of());
+                await(()->TranslationService.translateLiteral("Dimension: ae2:spatial_storage").equals("Dimensão: ae2:spatial_storage"),"dimension label or identifier changed");
+                await(()->TranslationService.translateLiteral("Vertical Chunk: -4").equals("Seção vertical: -4"),"vertical index changed");
+                check(mock.sent.isEmpty(),"dynamic known labels need inference");
+                check(ModTextPolicy.canonicalUi("Dimension: invalid identifier")==null,"arbitrary user input was treated as an identifier");
+            }
+        });
+        test("GuideMe_paragraph_layout_refresh_keeps_link_nodes_styles_and_originals",()->{
+            try(Mock mock=new Mock()) {
+                init("guideme-layout",mock,true);scan(Map.of(),Map.of(),Map.of());
+                mock.translation=source->source.replace("You can find ","Você pode encontrar ").replace("Meteorites","Meteoritos").replace(" near your base."," perto da sua base.");
+                FakeGuideScreen view=new FakeGuideScreen();
+                FakeGuideText left=new FakeGuideText("You can find "),linked=new FakeGuideText("Meteorites"),right=new FakeGuideText(" near your base.");
+                FakeGuideSpan link=new FakeGuideSpan(List.of(linked));Object linkStyle=link.style;
+                view.document.blocks.add(new FakeGuideParagraph(List.of(left,link,right)));
+                com.modtranslator.client.GuideMePageRefresh.refresh(view);
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return left.text.startsWith("Você")&&linked.text.equals("Meteoritos")&&right.text.equals(" perto da sua base.");},"guide flow text not updated before layout");
+                check(view.documentLayoutInvalid&&view.document.invalidations>0,"translated paragraph did not invalidate layout");
+                check(view.scrollY==130&&link.style==linkStyle&&link.children.get(0)==linked,"guide scroll/link identity/style lost");
+                check(mock.sent.stream().anyMatch(s->s.contains("You can find ")&&s.contains("Meteorites")&&s.contains(" near your base.")),"guide prose translated as separate positioned fragments");
+                TranslationService.setCachedTranslationDisplayEnabled(false);
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return left.text.equals("You can find ")&&linked.text.equals("Meteorites");},"guide original text not restored");
+            }
+        });
+        test("GuideMe_reordered_span_output_cannot_corrupt_fixed_link_structure",()->{
+            try(Mock mock=new Mock()) {
+                init("guideme-reorder",mock,true);scan(Map.of(),Map.of(),Map.of());
+                mock.translation=source->source.replace("You can find ","Você encontra ");
+                FakeGuideScreen view=new FakeGuideScreen();FakeGuideText left=new FakeGuideText("You can find "),right=new FakeGuideText("Meteorites");
+                view.document.blocks.add(new FakeGuideParagraph(List.of(left,right)));
+                com.modtranslator.client.GuideMePageRefresh.refresh(view);
+                await(()->mock.sent.size()>0,"guide test job not submitted");
+                Map<?,?> pendingJobs=jobs();
+                await(()->pendingJobs.isEmpty(),"guide test job not cached");
+                @SuppressWarnings("unchecked") Map<String,String> cache=(Map<String,String>)value(service(),"bySource");
+                String encoded=com.modtranslator.client.StyledTextCodec.encode(List.of("You can find ","Meteorites"));
+                cache.put(encoded,"<mt1>Meteoritos</mt1><mt0>Você encontra </mt0>");
+                com.modtranslator.client.GuideMePageRefresh.refresh(view);
+                check(left.text.equals("You can find ")&&right.text.equals("Meteorites"),"reordered spans changed fixed link topology");
+            }
+        });
+        test("visible_document_preserves_breaks_and_admits_bare_headings",()->{
+            List<String> visited=new ArrayList<>();
+            String original="Ready for Testing\r\n\r\nFeatures are ready.\n \n\nBasic Farming";
+            String resolved=VisibleDocument.resolve(original,block->{visited.add(block);return "PT: "+block;});
+            check(visited.equals(List.of("Basic Farming","Features are ready.","Ready for Testing")),"heading admission order lost");
+            check(resolved.equals("PT: Ready for Testing\r\n\r\nPT: Features are ready.\n \n\nPT: Basic Farming"),"paragraph separators changed");
+            check(VisibleDocument.resolve(original,block->null).equals(original),"unavailable paragraph removed");
+        });
+        test("Aether_cached_pages_update_headings_live_keep_page_and_restore_original",()->{
+            try(Mock mock=new Mock()) {
+                init("aether-live",mock,true);scan(Map.of(),Map.of(),Map.of());
+                mock.responseGate=new CountDownLatch(1);
+                mock.translation=source->Map.of("Ready for Testing","Pronto para testes","Features are ready.","Os recursos estão prontos.","Basic Farming","Agricultura básica","You can grow plants.","Você pode cultivar plantas.").getOrDefault(source,"PT: "+source);
+                FakeAetherPages view=new FakeAetherPages();
+                var original=net.minecraft.network.chat.Component.literal("Ready for Testing\n\nFeatures are ready.\n\nBasic Farming\n\nYou can grow plants.").withStyle(net.minecraft.ChatFormatting.GOLD);
+                var initial=com.modtranslator.client.AetherPageRefresh.capture(view,original);
+                view.createPages(initial);view.currentPageNumber=1;
+                check(view.visible.contains("Ready for Testing"),"pending heading disappeared");
+                mock.responseGate.countDown();
+                await(()->{com.modtranslator.client.AetherPageRefresh.refresh(view);return view.visible.contains("Pronto para testes")&&view.visible.contains("Agricultura básica")&&view.visible.contains("Você pode cultivar plantas.");},"open document did not refresh all headings/body");
+                check(view.currentPageNumber==1,"reading page was reset");
+                check(original.getString().startsWith("Ready for Testing"),"original document mutated");
+                check(view.color==original.getStyle().getColor().getValue(),"document root style lost");
+                check(mock.sent.contains("Ready for Testing")&&mock.sent.contains("Basic Farming"),"bare headings skipped prose heuristics");
+                TranslationService.setCachedTranslationDisplayEnabled(false);
+                await(()->{com.modtranslator.client.AetherPageRefresh.refresh(view);return view.visible.equals(original.getString());},"cache toggle did not restore original open page");
+            }
+        });
+        test("native_mod_document_override_wins_without_inference",()->{
+            try(Mock mock=new Mock()) {
+                init("aether-native",mock,true);
+                scan(Map.of("aether_ii.guidebook.description.test","Basic Farming\n\nYou can grow plants."),Map.of("aether_ii.guidebook.description.test","Agricultura\n\nCultive plantas."),Map.of());
+                check(TranslationService.translateModDocument("aether_ii.guidebook.description.test","Basic Farming\n\nYou can grow plants.").equals("Agricultura\n\nCultive plantas."),"native book translation replaced");
+                check(mock.sent.isEmpty(),"native document was unnecessarily inferred");
+            }
+        });
+        test("Logs_is_quest_item_caption_without_changing_unrelated_log_UI",()->{
+            try(Mock mock=new Mock()) {
+                init("quest-caption",mock,false);scan(Map.of(),Map.of("gui.test.console.logs","Logs"),Map.of());
+                check(TranslationService.translateQuest("Logs").equals("Troncos"),"quest item label still English");
+                check(TranslationService.translateLiteral("Logs").equals("Logs"),"unrelated console label changed");
+                check(mock.sent.isEmpty(),"known quest label needs a model");
+                TranslationService.setCachedTranslationDisplayEnabled(false);
+                check(TranslationService.translateQuest("Logs").equals("Logs"),"quest label ignored translation toggle");
+            }
+        });
+        test("advancement_title_brand_collision_is_scoped_and_respects_native_override",()->{
+            ModTextPolicy.registerModNames(List.of("Ice and Fire"));
+            try(Mock mock=new Mock()) {
+                init("advancement-title",mock,false);scan(Map.of("advancements.iceandfire.root.title","Ice and Fire","mod.test.brand","Ice and Fire"),Map.of(),Map.of());
+                check(translated("advancements.iceandfire.root.title","Ice and Fire").equals("Gelo e Fogo"),"structured advancement treated as brand");
+                check(translated("mod.test.brand","Ice and Fire").equals("Ice and Fire"),"mod identity translated");
+                check(TranslationService.translateLiteral("Ice and Fire").equals("Ice and Fire"),"literal identity translated");
+                TranslationService.setCachedTranslationDisplayEnabled(false);
+                check(translated("advancements.iceandfire.root.title","Ice and Fire").equals("Ice and Fire"),"advancement ignored saved-translation toggle");
+            } finally {ModTextPolicy.registerModNames(List.of());}
+        });
+        test("structured_advancement_chat_refresh_never_matches_player_messages",()->{
+            var advancement=net.minecraft.network.chat.Component.translatable("chat.type.advancement.task",net.minecraft.network.chat.Component.literal("Player"),net.minecraft.network.chat.Component.translatable("advancements.iceandfire.root.title"));
+            check(com.modtranslator.client.NpcDialogueText.isRefreshableGameMessage(advancement),"structured advancement not refreshed");
+            check(!com.modtranslator.client.NpcDialogueText.isDialogue(advancement),"advancement mistaken for NPC");
+            check(!com.modtranslator.client.NpcDialogueText.isRefreshableGameMessage(net.minecraft.network.chat.Component.literal("Ice and Fire")),"player literal opted in");
+            check(!com.modtranslator.client.NpcDialogueText.isRefreshableGameMessage(net.minecraft.network.chat.Component.translatable("chat.type.text",net.minecraft.network.chat.Component.literal("Player"),advancement)),"player message envelope bypassed");
         });
         test("NPC_chat_detection_does_not_match_player_written_NPC_labels",()->{
             check(com.modtranslator.client.NpcDialogueText.isDialogue(net.minecraft.network.chat.Component.translatable("dialogue.guard.finding")),"structured NPC dialogue not recognized");

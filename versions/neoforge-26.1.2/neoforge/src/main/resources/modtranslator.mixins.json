@@ -17,7 +17,9 @@
     "FancyMenuTextMixin",
     "TranslationProgressGuiMixin",
     "TranslationProgressScreenMixin",
-    "TranslationProgressMouseMixin"
+    "TranslationProgressMouseMixin",
+    "AetherDocumentMixin",
+    "GuideMeDocumentMixin"
   ],
   "injectors": {
     "defaultRequire": 1

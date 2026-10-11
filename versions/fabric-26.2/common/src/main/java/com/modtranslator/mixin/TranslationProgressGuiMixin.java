@@ -16,6 +16,9 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 /** Minecraft 26.2 composes screens and the world HUD in one GUI extraction. */
 @Mixin(Gui.class)
 public abstract class TranslationProgressGuiMixin {
+    @Inject(method="extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V",at=@At("HEAD"))
+    private void modtranslator$refreshAetherPage(CallbackInfo info) { com.modtranslator.client.AetherPageRefresh.refresh(Minecraft.getInstance().gui.screen()); }
+
     @Shadow @Final private GuiRenderState guiRenderState;
     @Inject(method="extractRenderState(Lnet/minecraft/client/DeltaTracker;ZZ)V",at=@At("TAIL"))
     private void traduzmods$renderProgress(DeltaTracker deltaTracker,boolean renderHud,boolean renderScreen,CallbackInfo info) {

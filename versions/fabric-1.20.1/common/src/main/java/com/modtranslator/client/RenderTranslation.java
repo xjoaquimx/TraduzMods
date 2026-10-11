@@ -43,6 +43,7 @@ public final class RenderTranslation {
             String method = frame.getMethodName().toLowerCase(Locale.ROOT);
             return INPUT_PATHS.contains(frame.getClassName()) || name.startsWith("dev.ftb.mods.ftbquests.")
                     || name.startsWith("de.keksuccino.fancymenu.util.rendering.text.markdown.")
+                    || name.startsWith("guideme.")
                     || name.contains("chatcomponent") || name.contains("chatscreen")
                     || name.contains("editbox") || name.contains("textinput")
                     || name.contains("bookeditscreen") || name.contains("signeditscreen")

@@ -12,7 +12,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-/** Rewrap existing NPC dialogue when asynchronous language entries arrive. Originals and signed chat stay intact. */
+/** Rewrap existing NPC dialogue and structured advancement announcements when asynchronous language entries arrive. Originals and signed chat stay intact. */
 @Mixin(ChatComponent.class)
 public abstract class NpcChatRefreshMixin {
     @Shadow private List<GuiMessage> allMessages;
@@ -24,7 +24,7 @@ public abstract class NpcChatRefreshMixin {
         if(!TranslationService.isPortugueseActive()||revision==modtranslator$revision||now<modtranslator$refreshAt)return;
         modtranslator$revision=revision;modtranslator$refreshAt=now+1000;
         boolean npc=false;
-        for(GuiMessage message:allMessages) if(NpcDialogueText.isDialogue(message.content())) {
+        for(GuiMessage message:allMessages) if(NpcDialogueText.isRefreshableGameMessage(message.content())) {
             // Resolving the original structured keys also promotes visible NPC lines over catalog work.
             message.content().getString(); npc=true;
         }

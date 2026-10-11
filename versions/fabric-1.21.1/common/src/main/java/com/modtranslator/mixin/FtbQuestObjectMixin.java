@@ -32,4 +32,12 @@ public abstract class FtbQuestObjectMixin {
             at = @At(value = "INVOKE", target = "Ldev/ftb/mods/ftbquests/util/TextUtils;parseRawText(Ljava/lang/String;)Lnet/minecraft/class_2561;"),
             index = 0, require = 0)
     private String modtranslator$wholeTitle(String source) { return FtbQuestClient.translate(this, source); }
+
+    @Inject(method = "getTitle", at = @At("RETURN"), cancellable = true, require = 0)
+    private void modtranslator$itemGroupCaption(CallbackInfoReturnable<Component> callback) {
+        Component title = callback.getReturnValue();
+        if (title == null || !"Logs".equals(title.getString()) || !FtbQuestClient.isClient(this)) return;
+        String translated = TranslationService.translateQuest("Logs");
+        if (!"Logs".equals(translated)) callback.setReturnValue(Component.literal(translated).setStyle(title.getStyle()));
+    }
 }

@@ -9,8 +9,22 @@ public final class ModTextPolicy {
     private static volatile Set<String> npcNames = Set.of(), installedNames = Set.of();
     private static volatile Pattern brands = Pattern.compile("(?!)");
     private static volatile ProtectedTokens protectedTokens;
+    private static final Pattern ROLE = Pattern.compile("<[A-Za-z ]{1,60}>");
+    private static final Pattern DIMENSION_ID = Pattern.compile("[a-z0-9_.-]+:[a-z0-9_/.-]+");
+    private static final Pattern INTEGER = Pattern.compile("-?\\d+");
     private record ProtectedTokens(Pattern formatting,Pattern brands,Pattern combined) {}
     private static final Map<String,String> UI = Map.ofEntries(
+            Map.entry("Server Admin", "Administração do servidor"),
+            Map.entry("Global Properties", "Propriedades globais"),
+            Map.entry("Default Dimension Properties", "Propriedades padrão das dimensões"),
+            Map.entry("Cave Layers", "Camadas de cavernas"),
+            Map.entry("Vertical Chunk", "Seção vertical"),
+            Map.entry("Max Zoom increased!", "Zoom máximo aumentado!"),
+            Map.entry("Color Palette UI", "Interface da paleta de cores"),
+            Map.entry("New Themes!", "Novos temas!"),
+            Map.entry("Webmap is now it's own mod", "O mapa web agora é um mod separado"),
+            Map.entry("New Work In Progress Waypoint Manager", "Novo gerenciador de pontos de referência em desenvolvimento"),
+            Map.entry("Plus Many more updates!", "E muitas outras melhorias!"),
             Map.entry("Steady Debug HUD Refresh Interval", "Intervalo de atualização do HUD de depuração"),
             Map.entry("Steady Debug HUD", "HUD de depuração com atualização fixa"),
             Map.entry("Refresh Interval", "Intervalo de atualização"),
@@ -55,15 +69,26 @@ public final class ModTextPolicy {
     }
 
     public static boolean isModName(String source) { return source != null && names.contains(source.strip()); }
+    public static String canonicalQuest(String source) { return "Logs".equals(source) ? "Troncos" : null; }
+    public static boolean isUntranslatedJourneyMapFallback(String key,String english,String nativeText) {
+        return key != null && key.startsWith("jm.") && english != null && english.equals(nativeText) && !isModName(english);
+    }
+    public static String canonicalLanguage(String key, String source) {
+        // The same words identify a brand elsewhere; only a structured advancement title is prose here.
+        return key != null && key.startsWith("advancements.") && key.endsWith(".title")
+                && "Ice and Fire".equals(source) ? "Gelo e Fogo" : null;
+    }
     public static String canonicalUi(String source) {
         String result=UI.get(source);
-        if(result==null && source!=null && source.matches("<[A-Za-z ]{1,60}>")) {
+        if(result==null && source!=null && source.startsWith("Dimension: ") && DIMENSION_ID.matcher(source.substring(11)).matches())return "Dimensão: "+source.substring(11);
+        if(result==null && source!=null && source.startsWith("Vertical Chunk: ") && INTEGER.matcher(source.substring(16)).matches())return "Seção vertical: "+source.substring(16);
+        if(result==null && source!=null && source.startsWith("<") && ROLE.matcher(source).matches()) {
             String role=UI.get(source.substring(1,source.length()-1)); if(role!=null)return "<"+role+">";
         }
         return result;
     }
     public static boolean hasEnglishUi(String source) {
-        return source != null && UI_TERMS.stream().anyMatch(term -> source.contains(term));
+        return source != null && (canonicalUi(source)!=null || UI_TERMS.stream().anyMatch(term -> source.contains(term)));
     }
     public static Pattern protectedTokens(Pattern formatting) {
         Pattern currentBrands=brands;

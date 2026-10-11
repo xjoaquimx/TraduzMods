@@ -16,7 +16,9 @@
     "NpcChatRefreshMixin",
     "FancyMenuTextMixin",
     "TranslationProgressGuiMixin",
-    "TranslationProgressMouseMixin"
+    "TranslationProgressMouseMixin",
+    "AetherDocumentMixin",
+    "GuideMeDocumentMixin"
   ],
   "injectors": {
     "defaultRequire": 1

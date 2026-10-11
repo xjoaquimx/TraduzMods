@@ -11,6 +11,22 @@ public final class ModTranslatorMixinPlugin implements IMixinConfigPlugin {
     public void onLoad(String name) {}
     public String getRefMapperConfig() {return null;}
     public boolean shouldApplyMixin(String target,String mixin) {
+        if(mixin.endsWith(".GuideMeDocumentMixin")) {
+            try {
+                ClassNode type=MixinService.getService().getBytecodeProvider().getClassNode(target,false);
+                return type.methods.stream().anyMatch(m->m.name.equals("ensureDocumentLayout")&&m.desc.equals("()V"))
+                        &&type.methods.stream().anyMatch(m->m.name.equals("getDocument")&&m.desc.equals("()Lguideme/document/block/LytDocument;"))
+                        &&type.fields.stream().anyMatch(f->f.name.equals("documentLayoutInvalid")&&f.desc.equals("Z"));
+            } catch(Exception absent) {return false;}
+        }
+        if(mixin.endsWith(".AetherDocumentMixin")) {
+            try {
+                ClassNode type=MixinService.getService().getBytecodeProvider().getClassNode(target,false);
+                return type.methods.stream().anyMatch(m->m.name.equals("createPages")&&m.desc.equals("("+org.objectweb.asm.Type.getDescriptor(net.minecraft.network.chat.Component.class)+")V"))
+                        &&type.fields.stream().anyMatch(f->f.name.equals("pages")&&f.desc.equals("Ljava/util/Map;"))
+                        &&type.fields.stream().anyMatch(f->f.name.equals("currentPageNumber")&&f.desc.equals("I"));
+            } catch(Exception absent) {return false;}
+        }
         if(!mixin.endsWith(".FancyMenuTextMixin"))return true;
         try {
             ClassNode type=MixinService.getService().getBytecodeProvider().getClassNode(target,false);

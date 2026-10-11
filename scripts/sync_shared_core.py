@@ -12,7 +12,8 @@ failures=[];checked=0
 for version,loader,resource_type in targets:
     destination=root/'versions'/version
     files=[path.relative_to(base) for path in (base/'common/src/main/java/com/modtranslator/core').glob('*.java') if path.name!='QuestCatalog.java']
-    files += [Path('common/src/main/java/com/modtranslator/client')/name for name in ['TranslationProgressLayout.java','TranslationProgressControl.java','TranslationPanelMotion.java']]
+    files += [Path('common/src/main/java/com/modtranslator/client')/name for name in ['TranslationProgressLayout.java','TranslationProgressControl.java','TranslationPanelMotion.java','AetherPageRefresh.java','GuideMePageRefresh.java','NpcDialogueText.java']]
+    files += [Path('common/src/main/java/com/modtranslator/mixin')/name for name in ['AetherDocumentMixin.java','GuideMeDocumentMixin.java']]
     for relative in files:
         content=(base/relative).read_text(encoding='utf-8').replace('ResourceLocation',resource_type)
         path=destination/relative

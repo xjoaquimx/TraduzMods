@@ -121,7 +121,7 @@ public final class TranslationService {
             atomicWrite(file,GSON.toJson(config));
             LocalTranslationClient.setUserPaused(config.translationPaused);
             instance=new TranslationService(config,directory,ids);
-            LOG.log(System.Logger.Level.INFO,"TraduzMods 2.0.0-alpha.1 {0} automatic worker initialized; {1} cached keys, {2} installed mods.",TranslationEdition.current().id(),instance.cache.size(),ids.size());
+            LOG.log(System.Logger.Level.INFO,"TraduzMods 2.0.0-alpha.2 {0} automatic worker initialized; {1} cached keys, {2} installed mods.",TranslationEdition.current().id(),instance.cache.size(),ids.size());
         } catch(Exception e) { LOG.log(System.Logger.Level.ERROR,"Translation initialization failed.",e); }
     }
     public static boolean isPortugueseActive() { return portugueseActive; }
@@ -189,12 +189,28 @@ public final class TranslationService {
     public static String translateLiteral(String source) { return instance==null?source:instance.literal(source); }
     public static String translateStyled(String source) { return instance==null?source:instance.styled(source); }
     public static String translateQuest(String source) { return instance==null?source:instance.quest(source); }
+    /** Only trusted mod documentation calls this; never pass player chat, writable books or user input. */
+    public static String translateModDocument(String key,String source) { return instance==null?source:instance.document(key,source); }
+
+    private String document(String key,String source) {
+        if(!config.enabled||!portugueseActive||!catalogReady||source==null||source.isBlank()||!config.displayCachedTranslations)return source;
+        String nativeValue=key==null?null:nativePortuguese.get(key);
+        if(nativeValue!=null)return nativeValue;
+        String original=key==null?source:english.getOrDefault(key,source);
+        String hit=bySource.get(original); if(hit!=null)return hit;
+        return VisibleDocument.resolve(original,block->{
+            String translated=bySource.get(block); if(translated!=null)return translated;
+            // Headings lack the English prose heuristics. Their document origin supplies that provenance.
+            enqueue("@document",block,true); return block;
+        });
+    }
 
     private String quest(String source) {
         if(!config.enabled||!portugueseActive||!catalogReady||source==null||source.isBlank()) return source;
         String nativeValue=questNativeBySource.get(source); if(nativeValue!=null) return nativeValue;
-        if(nativeTexts.contains(source)||translatedTexts.contains(source)) return source;
+        String canonical=ModTextPolicy.canonicalQuest(source); if(canonical!=null)return config.displayCachedTranslations?canonical:source;
         String hit=bySource.get(source); if(hit!=null) return config.displayCachedTranslations?hit:source;
+        if(nativeTexts.contains(source)||translatedTexts.contains(source)) return source;
         enqueue("@quest",source,true); return source;
     }
     private String styled(String source) {
@@ -211,6 +227,7 @@ public final class TranslationService {
         String nativeValue=nativePortuguese.get(key);
         // Explicit native Brazilian strings win, including resource-pack overrides.
         if(nativeValue!=null) return nativeValue;
+        String contextual=ModTextPolicy.canonicalLanguage(key,source); if(contextual!=null)return config.displayCachedTranslations?contextual:source;
         if(ModTextPolicy.isNpcNameKey(key)) return english.getOrDefault(key,source);
         if(ModTextPolicy.isModName(source)) return source;
         String original=english.get(key);
@@ -282,6 +299,7 @@ public final class TranslationService {
                 Map<String,String> nativeMap=pt.getOrDefault(entry.getKey(),Map.of()); int nativeCount=0,pendingCount=0;
                 for(var e:entry.getValue().entrySet()) {
                     allEnglish.put(e.getKey(),e.getValue()); String nativeValue=nativeMap.get(e.getKey());
+                    if(ModTextPolicy.isUntranslatedJourneyMapFallback(e.getKey(),e.getValue(),nativeValue))nativeValue=null;
                     // Some mods ship unchanged English inside pt_br.json (e.g. Quests).
                     if(nativeValue!=null&&!nativeValue.isBlank()&&(!nativeValue.equals(e.getValue())||!looksEnglish(nativeValue))) { allNative.put(e.getKey(),nativeValue); nativeCount++; }
                     else if(valid(e.getKey(),e.getValue())) { missing++; pendingCount++; }
@@ -296,7 +314,7 @@ public final class TranslationService {
                 String old=bySource.remove(name); if(old!=null)translatedTexts.remove(old); jobs.remove(name);visibleTracking.remove(name);
             }
             // Remove unchanged English native entries that were identified as missing above.
-            allNative.entrySet().removeIf(e -> e.getValue().equals(allEnglish.get(e.getKey()))&&looksEnglish(e.getValue()));
+            allNative.entrySet().removeIf(e -> e.getValue().equals(allEnglish.get(e.getKey()))&&(looksEnglish(e.getValue())||ModTextPolicy.isUntranslatedJourneyMapFallback(e.getKey(),allEnglish.get(e.getKey()),e.getValue())));
             english=Map.copyOf(allEnglish); nativePortuguese=Map.copyOf(allNative); nativeTexts=Set.copyOf(allNative.values()); discovered=missing; catalogReady=true;
             Set<String> known=new HashSet<>(); allEnglish.values().forEach(text -> known.add(text.replaceAll("[&Â§][0-9a-fk-orA-FK-OR]",""))); knownEnglishTexts=Set.copyOf(known);
             Map<String,String> questNative=new HashMap<>(); quests.english().forEach((key,value)->{String ptValue=allNative.get(key); if(ptValue!=null)questNative.put(value,ptValue);});questNativeBySource=Map.copyOf(questNative);
@@ -539,7 +557,7 @@ public final class TranslationService {
             }
             long queued=queueVersion.get();
             if(force||checkpoint||(queued!=savedQueueVersion&&now-lastQueueSnapshot>=10_000&&visibleTracking.isEmpty())){atomicWrite(directory.resolve("pending.json"),CACHE_JSON.toJson(jobs.values()));savedQueueVersion=queued;lastQueueSnapshot=now;}
-            JsonObject status=new JsonObject(); status.addProperty("version","2.0.0-alpha.1");status.addProperty("paragraphReuseHits",LocalTranslationClient.paragraphReuseCount());status.addProperty("translationEngine","local-hy-mt2");status.addProperty("economyOnDemand",provider.isEconomyMode());status.addProperty("ptBrActive",portugueseActive);status.addProperty("installedMods",modIds.size());status.addProperty("discoveredMissing",discovered);status.addProperty("cachedUniqueSources",bySource.size());status.addProperty("pending",jobs.size());status.addProperty("translatedThisRun",commits);status.addProperty("provider",providerState);status.addProperty("local",provider.status());status.addProperty("lastFailure",lastFailure);status.addProperty("updatedAt",java.time.Instant.now().toString());
+            JsonObject status=new JsonObject(); status.addProperty("version","2.0.0-alpha.2");status.addProperty("paragraphReuseHits",LocalTranslationClient.paragraphReuseCount());status.addProperty("translationEngine","local-hy-mt2");status.addProperty("economyOnDemand",provider.isEconomyMode());status.addProperty("ptBrActive",portugueseActive);status.addProperty("installedMods",modIds.size());status.addProperty("discoveredMissing",discovered);status.addProperty("cachedUniqueSources",bySource.size());status.addProperty("pending",jobs.size());status.addProperty("translatedThisRun",commits);status.addProperty("provider",providerState);status.addProperty("local",provider.status());status.addProperty("lastFailure",lastFailure);status.addProperty("updatedAt",java.time.Instant.now().toString());
             status.addProperty("translationQualityVersion",TRANSLATION_QUALITY_VERSION);status.addProperty("nativeTerminologyEntries",GameTranslationContext.nativeTermCount());
             status.addProperty("storageMode","journal");status.addProperty("localBackend",LocalTranslationClient.backend());status.addProperty("lastTranslationMs",lastTranslationMs);status.addProperty("lastCheckpointMillis",lastCheckpoint);
             status.addProperty("localMemoryBudgetMiB",LocalResourcePolicy.currentMemoryBudgetMiB());status.addProperty("localIdleUnloadSeconds",LocalResourcePolicy.IDLE_MILLIS/1000);status.addProperty("pretranslateWhilePlaying",TranslationEdition.current().allowsBackgroundWhilePlaying());
