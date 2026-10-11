@@ -90,3 +90,14 @@ tasks.register('integrationTest', JavaExec) {
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
 }
 tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8' }
+
+// Optional integration check against an installed GuideMe version, never a production dependency.
+tasks.register('guideMeIntegration', JavaExec) {
+    notCompatibleWithConfigurationCache('Optional installed-mod fixture uses a fresh directory.')
+    dependsOn testClasses
+    classpath = sourceSets.test.runtimeClasspath
+    if (providers.gradleProperty('guideMeJar').isPresent()) classpath += files(providers.gradleProperty('guideMeJar').get())
+    mainClass = 'com.modtranslator.core.GuideMeApiIntegration'
+    args layout.buildDirectory.dir('guideme-integration-' + System.currentTimeMillis()).get().asFile.absolutePath
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(25) }
+}

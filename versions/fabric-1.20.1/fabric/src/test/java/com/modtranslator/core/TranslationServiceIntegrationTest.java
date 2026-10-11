@@ -49,6 +49,24 @@ class TranslationServiceIntegrationTest {
             for(int i=0;i<blocks.length;i++)pages.put(i,List.of(net.minecraft.network.chat.Component.literal(blocks[i])));
         }
     }
+    static final class FakeGuideRow {
+        private final FakeGuideParagraph paragraph;
+        FakeGuideRow(String text){paragraph=new FakeGuideParagraph(List.of(new FakeGuideText(text)));}
+        String text(){return ((FakeGuideText)paragraph.content.get(0)).text;}
+    }
+    static final class FakeGuideNavbar {
+        private final List<FakeGuideRow> rows=new ArrayList<>();int layouts;int scrollY=47;
+        private void updateLayout(){layouts++;}
+    }
+    static final class FakeCompleteGuide {
+        private final FakeGuideDocument document=new FakeGuideDocument();
+        private final FakeGuideParagraph pageTitle=new FakeGuideParagraph(List.of(new FakeGuideText("The Charger")));
+        private final FakeGuideNavbar navbar=new FakeGuideNavbar();
+        boolean documentLayoutInvalid;int layouts;int scrollY=130;
+        protected FakeGuideDocument getDocument(){return document;}
+        private void updateScreenLayout(){layouts++;com.modtranslator.client.GuideMePageRefresh.refresh(this);}
+        String title(){return ((FakeGuideText)pageTitle.content.get(0)).text;}
+    }
     static final Gson GSON = new Gson();
     static final List<String> failures = new ArrayList<>();
     static Path root;
@@ -1471,6 +1489,33 @@ class TranslationServiceIntegrationTest {
                 Thread.sleep(250);check(jobs().isEmpty()&&mock.stops.get()==0,"Normal drops loaded model between quests while screen stays open");
                 set(svc,"readingScreenProbe",(BooleanSupplier)()->false);invoke(svc,"requestTick");await(()->mock.stops.get()>0,"Normal retained idle model after closing reading screen");
                 check(mock.sent.size()==1&&TranslationService.translateLiteral(source).startsWith("PT: "),"model unload lost or retransmitted completed disk cache");
+            }
+        });
+
+        test("GuideMe_detached_title_and_navigation_relayout_without_reopening",()->{
+            try(Mock mock=new Mock()) {
+                init("guide-complete",mock,true);scan(Map.of(),Map.of(),Map.of());
+                mock.translation=source->source.replace("The Charger","O Carregador").replace("Getting Started","Primeiros passos").replace("Simple Automation","Automação simples");
+                FakeCompleteGuide view=new FakeCompleteGuide();
+                view.document.blocks.add(new FakeGuideParagraph(List.of(new FakeGuideText("Simple Automation"))));
+                FakeGuideRow row=new FakeGuideRow("Getting Started");view.navbar.rows.add(row);
+                com.modtranslator.client.GuideMePageRefresh.refresh(view);
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return view.title().equals("O Carregador")&&row.text().equals("Primeiros passos")&&view.layouts>0&&view.navbar.layouts>0;},"detached title or sidebar failed to refresh");
+                check(view.scrollY==130&&view.navbar.scrollY==47,"guide navigation refresh reset scroll");
+                TranslationService.setCachedTranslationDisplayEnabled(false);
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return view.title().equals("The Charger")&&row.text().equals("Getting Started");},"detached title/sidebar originals not restored");
+            }
+        });
+        test("GuideMe_new_sidebar_rows_are_discovered_without_cache_revision_change",()->{
+            try(Mock mock=new Mock()) {
+                init("guide-new-rows",mock,true);scan(Map.of(),Map.of(),Map.of());
+                TranslationService.setTranslationPaused(true);
+                FakeCompleteGuide view=new FakeCompleteGuide();com.modtranslator.client.GuideMePageRefresh.refresh(view);
+                long revision=TranslationService.revision();Thread.sleep(550);
+                view.navbar.rows.add(new FakeGuideRow("Items, Blocks, and Machines"));
+                com.modtranslator.client.GuideMePageRefresh.refresh(view);
+                check(TranslationService.revision()==revision,"test unexpectedly changed cache revision");
+                check(jobs().keySet().stream().anyMatch(k->k.toString().contains("Items, Blocks, and Machines")),"expanded sidebar row never queued");
             }
         });
 
