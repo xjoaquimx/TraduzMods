@@ -6,11 +6,13 @@ O modelo é **Tencent Hy-MT2-1.8B GGUF Q4_K_M**. Não precisa de chave de API. M
 
 ## Download
 
+Os seis JARs estão anexados à [Release 1.0.0](https://github.com/xjoaquimx/TraduzMods/releases/tag/v1.0.0).
+
 | Minecraft | Loader | Lite | Normal |
 | --- | --- | --- | --- |
-| 1.20.1 | Fabric | [Baixar](releases/1.0.0/traduzmods-fabric-1.0.0-lite-mc1.20.1.jar) | [Baixar](releases/1.0.0/traduzmods-fabric-1.0.0-normal-mc1.20.1.jar) |
-| 26.2 | Fabric | [Baixar](releases/1.0.0/traduzmods-fabric-1.0.0-lite-mc26.2.jar) | [Baixar](releases/1.0.0/traduzmods-fabric-1.0.0-normal-mc26.2.jar) |
-| 26.1.2 | NeoForge | [Baixar](releases/1.0.0/traduzmods-neoforge-1.0.0-lite-mc26.1.2.jar) | [Baixar](releases/1.0.0/traduzmods-neoforge-1.0.0-normal-mc26.1.2.jar) |
+| 1.20.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v1.0.0/traduzmods-fabric-1.0.0-lite-mc1.20.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v1.0.0/traduzmods-fabric-1.0.0-normal-mc1.20.1.jar) |
+| 26.2 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v1.0.0/traduzmods-fabric-1.0.0-lite-mc26.2.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v1.0.0/traduzmods-fabric-1.0.0-normal-mc26.2.jar) |
+| 26.1.2 | NeoForge | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v1.0.0/traduzmods-neoforge-1.0.0-lite-mc26.1.2.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v1.0.0/traduzmods-neoforge-1.0.0-normal-mc26.1.2.jar) |
 
 **Lite:** atende os textos consultados com um perfil conservador de recursos. **Normal:** também traduz o catálogo em segundo plano e adapta seu perfil aos recursos disponíveis. Ambas usam o mesmo modelo e cache; veja os limites no [guia](docs/GUIA.md).
 
