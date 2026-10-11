@@ -1,6 +1,6 @@
 # Ensaios locais de otimização — 11/10/2026
 
-Computador: 16294 MiB de RAM física, 12 threads lógicas, NVIDIA RTX 5060 com 8151 MiB de VRAM, driver 617.42. Runtime llama.cpp b11429. Medianas abaixo são de pedidos com o modelo carregado; partida a frio, FPS e carregamento de mundo são medidas diferentes.
+**Todos os testes locais desta versão foram executados no PC do autor:** AMD Ryzen 5 5600X (6 núcleos / 12 threads), 16 GB de RAM (16294 MiB físicos reportados), NVIDIA RTX 5060 de 8 GB (8151 MiB reportados), driver 617.42, Windows 11 Pro 10.0.26200 / build 26200. As medições refletem essa configuração, os textos e os recursos disponíveis; devem ser reproduzidas para avaliar outro computador. Runtime llama.cpp b11429. Medianas abaixo são de pedidos com o modelo carregado; partida a frio, FPS e carregamento de mundo são medidas diferentes.
 
 ## Qual GGUF usar
 
@@ -52,4 +52,4 @@ A Lite CPU teve 1588,73 MiB residentes e mediana de 3122,97 ms nesta rodada. O r
 
 Reservando mais 1440 MiB de páginas físicas para simular outros aplicativos, a Normal continuou traduzindo com CUDA. A RAM disponível chegou a 1805,25 MiB durante o ensaio; pico residente de 660,60 MiB e mediana de 228,78 ms. As três variantes e o ensaio de pressão passaram na pausa/retomada real do servidor e na reutilização depois da retomada. Não foi necessário esgotar a memória para comprovar o novo comportamento.
 
-Os ensaios nativos foram isolados de instâncias do jogador e respeitaram a trava global do modelo. Os testes de integração usam um substituto de inferência para cobrir fila, falhas, durabilidade, pausa, prioridade, Unicode, glossário e controles. A inferência real é verificada em uma suíte separada. O painel foi renderizado no cliente real do Minecraft 1.21.1, com contagens simuladas e callbacks dos botões exercitados. A validação com quests e NPCs de cada modpack continua pendente antes de uma versão estável 2.0.0.
+Os ensaios nativos foram isolados de instâncias do jogador e respeitaram a trava global do modelo. Os testes de integração usam um substituto de inferência para cobrir fila, falhas, durabilidade, pausa, prioridade, Unicode, glossário e controles. A inferência real é verificada em uma suíte separada. O painel foi renderizado no cliente real do Minecraft 1.21.1, com contagens simuladas e callbacks dos botões exercitados. A Normal também foi carregada no ATM11, preservou o cache e registrou 144 novas traduções no checkpoint de inicialização observado. O autor relatou uso satisfatório. A validação exaustiva com quests, NPCs e outras combinações de modpack/plataforma continua pendente antes de uma versão estável 2.0.0.

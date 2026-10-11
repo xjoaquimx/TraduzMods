@@ -4,7 +4,17 @@
   "hardware": {
     "totalMemoryMiB": 16294,
     "logicalThreads": 12,
-    "gpu": "NVIDIA GeForce RTX 5060, 8151 MiB, 617.42"
+    "gpu": "NVIDIA GeForce RTX 5060, 8151 MiB, 617.42",
+    "cpu": "AMD Ryzen 5 5600X",
+    "physicalCores": 6,
+    "installedRam": "16 GB",
+    "gpuName": "NVIDIA GeForce RTX 5060",
+    "gpuTotalMiB": 8151,
+    "gpuDriver": "617.42",
+    "operatingSystem": "Windows 11 Pro",
+    "osVersion": "10.0.26200",
+    "osBuild": "26200",
+    "testMachine": "Project author personal PC"
   },
   "integrationPassed": 648,
   "integrationFailed": 0,
@@ -280,9 +290,21 @@
   "limitations": [
     "Candidate alpha; no stable 2.0.0 publication.",
     "Native inference measured without Minecraft; other desktop applications remained open. Not an FPS benchmark. profile records the request; effectiveCompact records the actual automatic fallback.",
-    "Minecraft 1.21.1 rendered native HUD and exercised button callbacks with synthetic counters; actual modpack acceptance remains pending.",
+    "Minecraft 1.21.1 rendered native HUD and exercised button callbacks with synthetic counters; ATM11 Normal has author-reported successful use; other modpacks/platform combinations remain unverified in actual play.",
     "Fabric 1.21.1 optional FTB/FancyMenu integrations need tests with those mods installed.",
     "No support claim for all Minecraft versions after 1.7.",
     "Formatting/name preservation is not a guarantee of correct meaning."
-  ]
+  ],
+  "atm11PlayTest": {
+    "pack": "All the Mods 11 - ATM11",
+    "packVersion": "0.11.1-beta",
+    "minecraft": "26.1.2",
+    "neoForge": "26.1.2.109",
+    "edition": "normal",
+    "detectedVersion": "2.0.0-alpha.1",
+    "cacheAndPreferencesPreservedAtInstallation": true,
+    "newTranslationsAtObservedStartupCheckpoint": 144,
+    "authorReportedSatisfactoryUse": true,
+    "scope": "Client startup, observed real translation/persistence, author feedback; no exhaustive screen inventory or FPS benchmark."
+  }
 }

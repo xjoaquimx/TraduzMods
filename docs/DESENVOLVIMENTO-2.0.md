@@ -21,7 +21,7 @@ Cada resultado aceito é gravado e sincronizado no registro durável **antes** d
 
 ## Painel
 
-O painel tem cabeçalho TraduzMods/Lite ou Normal, faixa de estado, contagem em disco, textos desta sessão e progresso. Mantém botões nativos de pausa/retomada, exibição do cache e recolhimento lateral. As áreas de clique e a animação acompanham as novas dimensões. O cliente real do Minecraft 1.21.1 carregou o mod e validou o desenho com fontes/botões nativos, pausa/retomada, exibição do cache e recolhimento. As contagens nas capturas são simuladas. A inspeção visual dentro de cada modpack ainda faz parte da validação da alpha.
+O painel tem cabeçalho TraduzMods/Lite ou Normal, faixa de estado, contagem em disco, textos desta sessão e progresso. Mantém botões nativos de pausa/retomada, exibição do cache e recolhimento lateral. As áreas de clique e a animação acompanham as novas dimensões. O cliente real do Minecraft 1.21.1 carregou o mod e validou o desenho com fontes/botões nativos, pausa/retomada, exibição do cache e recolhimento. As contagens nas capturas são simuladas. A Normal foi instalada no ATM11 0.11.1-beta / NeoForge 26.1.2.109 e recebeu relato de uso satisfatório do autor. A verificação de todas as telas e dos demais modpacks continua pendente.
 
 ![Painel no Minecraft 1.21.1, contagens simuladas](images/traduzmods-normal.png)
 
@@ -32,7 +32,7 @@ O painel tem cabeçalho TraduzMods/Lite ou Normal, faixa de estado, contagem em 
 | 1.20.1 | Fabric | Lite e Normal compiladas; integração e inferência nativa isolada verificadas |
 | 1.21.1 | Fabric | Novo adaptador; ambas compiladas; mixins principais conferidos; cliente real e controles do painel exercitados |
 | 26.2 | Fabric | Ambas compiladas e verificadas na suíte de integração |
-| 26.1.2 | NeoForge | Ambas compiladas e verificadas na suíte de integração |
+| 26.1.2 | NeoForge | Ambas compiladas e verificadas na suíte de integração; Normal carregada no ATM11 com tradução real e relato de uso satisfatório |
 
 Foram executados **81 casos em cada variante: 648 sucessos, zero falhas**. Isso não equivale a abrir todos os modpacks nem a medir FPS. Integrações opcionais de FTB Quests/FancyMenu na nova 1.21.1 precisam de ensaios com os respectivos mods presentes.
 
@@ -58,4 +58,4 @@ python ../../../scripts/benchmark_models.py --runtime C:/bench/runtime-cuda/llam
 
 O script requer Python 3.11+ e `psutil`, não baixa arquivos, utiliza servidor autenticado apenas em loopback, respeita a trava global do mod e encerra somente seu próprio processo. `--output` precisa apontar para uma pasta nova. O resultado automático verifica conclusão da resposta; a restauração de nomes/formatação e a revisão do sentido são etapas separadas.
 
-Veja [a comparação dos modelos e seus limites](BENCHMARK-2.0.md).
+Veja [o changelog técnico](CHANGELOG-2.0.0-alpha.1.md), [a configuração do PC do autor e a comparação dos modelos](BENCHMARK-2.0.md).
