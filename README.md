@@ -1,21 +1,21 @@
 # TraduzMods
 
-**2.0.0-alpha.1 — pré-lançamento:** [Release e oito JARs](https://github.com/xjoaquimx/TraduzMods/releases/tag/v2.0.0-alpha.1), [alterações técnicas](docs/CHANGELOG-2.0.0-alpha.1.md) e [ensaios no PC do autor](docs/BENCHMARK-2.0.md). A **1.0.0 permanece a versão estável**.
+**2.0.0-alpha.4 — pré-lançamento:** [Release e oito JARs](https://github.com/xjoaquimx/TraduzMods/releases/tag/v2.0.0-alpha.4), [alterações técnicas](docs/CHANGELOG-2.0.0-alpha.4.md) e [validação no PC do autor](docs/validation-2.0-alpha.4.json). A **1.0.0 permanece a versão estável**.
 
 Tradução automática de textos de mods para **português do Brasil**, feita localmente no computador. Usa as traduções nativas disponíveis, prioriza os textos que você abre e salva os resultados em disco para reutilizar nas próximas sessões.
 
 O modelo é **Tencent Hy-MT2-1.8B GGUF Q4_K_M**. Não precisa de chave de API. Modelo e runtime são baixados no primeiro uso; depois, a inferência é local. Esses arquivos não estão incluídos nos JARs deste repositório. O download automático do runtime atualmente atende **Windows x64**; outras plataformas não foram validadas nesta versão.
 
-## Download — 2.0.0-alpha.1
+## Download — 2.0.0-alpha.4
 
 | Minecraft | Loader | Lite | Normal |
 | --- | --- | --- | --- |
-| 1.20.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-fabric-1.20.1-lite-2.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-fabric-1.20.1-normal-2.0.0-alpha.1.jar) |
-| 1.21.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-fabric-1.21.1-lite-2.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-fabric-1.21.1-normal-2.0.0-alpha.1.jar) |
-| 26.2 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-fabric-26.2-lite-2.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-fabric-26.2-normal-2.0.0-alpha.1.jar) |
-| 26.1.2 | NeoForge | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-neoforge-26.1.2-lite-2.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.1/traduzmods-neoforge-26.1.2-normal-2.0.0-alpha.1.jar) |
+| 1.20.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.20.1-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.20.1-normal-2.0.0-alpha.4.jar) |
+| 1.21.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.21.1-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.21.1-normal-2.0.0-alpha.4.jar) |
+| 26.2 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-26.2-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-26.2-normal-2.0.0-alpha.4.jar) |
+| 26.1.2 | NeoForge | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-neoforge-26.1.2-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-neoforge-26.1.2-normal-2.0.0-alpha.4.jar) |
 
-SHA-256 e relatório: [manifesto](releases/2.0.0-alpha.1/releases.json), [checksums](releases/2.0.0-alpha.1/SHA256SUMS.txt) e [validação](releases/2.0.0-alpha.1/VALIDACAO.json). Detalhes e limites desta alpha estão no [guia de desenvolvimento](docs/DESENVOLVIMENTO-2.0.md).
+SHA-256 e relatório: [manifesto](releases/2.0.0-alpha.4/releases.json), [checksums](releases/2.0.0-alpha.4/SHA256SUMS.txt) e [validação](releases/2.0.0-alpha.4/VALIDACAO.json). Detalhes e limites desta alpha estão no [guia de desenvolvimento](docs/DESENVOLVIMENTO-2.0.md).
 
 ## Download — 1.0.0 estável
 
@@ -50,8 +50,8 @@ Use **JDK 25 para executar o Gradle**. A versão Fabric 1.20.1 gera classes Java
 Exemplo no Windows, na pasta `versions/fabric-1.20.1/fabric`:
 
 ```powershell
-.\gradlew.bat build "-Pmod_version=2.0.0-alpha.1-lite" -Pedition=lite
-.\gradlew.bat build "-Pmod_version=2.0.0-alpha.1-normal" -Pedition=normal
+.\gradlew.bat build "-Pmod_version=2.0.0-alpha.4-lite" -Pedition=lite
+.\gradlew.bat build "-Pmod_version=2.0.0-alpha.4-normal" -Pedition=normal
 .\gradlew.bat integrationTest -Pedition=normal
 ```
 
@@ -67,7 +67,7 @@ python scripts/verify_alpha_release.py
 
 ## Documentação e validação
 
-- [Changelog técnico 2.0.0-alpha.1](docs/CHANGELOG-2.0.0-alpha.1.md), [comparação dos modelos](docs/BENCHMARK-2.0.md) e [validação da alpha](docs/validation-2.0-summary.json).
+- [Changelog técnico 2.0.0-alpha.4](docs/CHANGELOG-2.0.0-alpha.4.md), [comparação dos modelos](docs/BENCHMARK-2.0.md) e [validação da alpha](docs/validation-2.0-alpha.4.json).
 - [Guia da versão estável 1.0.0](docs/GUIA.md)
 - [Validação da versão 1.0.0](docs/VALIDACAO.md): 450 casos passaram, zero falhas; limites do ensaio estão documentados.
 - Alterações das edições [Lite](docs/CHANGELOG-lite.md) e [Normal](docs/CHANGELOG-normal.md).

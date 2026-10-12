@@ -27,4 +27,4 @@ A suíte adicional usa as classes reais do GuideMe 26.1.15-beta, incluindo folha
 
 Os testes foram executados no computador do autor: Ryzen 5 5600X, 16 GB de RAM, RTX 5060 de 8 GB e Windows 11 Pro. Esta correção não inclui um novo benchmark de velocidade, FPS ou qualidade do modelo.
 
-Compilação local de teste, sem publicação externa nesta etapa.
+Correções incluídas no pré-lançamento 2.0.0-alpha.4 do GitHub.

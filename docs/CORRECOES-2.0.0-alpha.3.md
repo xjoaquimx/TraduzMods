@@ -28,4 +28,4 @@ Uma verificação adicional carrega o JAR real do GuideMe 26.1.15-beta do ATM11 
 
 A inspeção do bytecode confirma os alvos do mixin, os campos e métodos do título/navegação e o argumento `true` nas três consultas opcionais. A causa original foi diagnosticada no jogo real. A apresentação visual final no manual do Carregador deve ser conferida após reiniciar com o novo JAR.
 
-Esta é uma compilação local de teste. Não foi publicada no GitHub ou no CurseForge.
+As correções desta etapa estão incluídas no pré-lançamento 2.0.0-alpha.4 do GitHub.

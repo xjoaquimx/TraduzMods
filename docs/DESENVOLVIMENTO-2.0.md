@@ -34,7 +34,7 @@ O painel tem cabeçalho TraduzMods/Lite ou Normal, faixa de estado, contagem em 
 | 26.2 | Fabric | Ambas compiladas e verificadas na suíte de integração |
 | 26.1.2 | NeoForge | Ambas compiladas e verificadas na suíte de integração; Normal carregada no ATM11 com tradução real e relato de uso satisfatório |
 
-Foram executados **81 casos em cada variante: 648 sucessos, zero falhas**. Isso não equivale a abrir todos os modpacks nem a medir FPS. Integrações opcionais de FTB Quests/FancyMenu na nova 1.21.1 precisam de ensaios com os respectivos mods presentes.
+Na alpha.4 foram executados **95 casos em cada variante: 760 sucessos, zero falhas**. As regressões novas e seus limites estão no [changelog técnico](CHANGELOG-2.0.0-alpha.4.md). As medições de inferência e microbenchmarks anteriores pertencem à alpha.1; não foram repetidas nesta correção. Isso não equivale a abrir todos os modpacks nem a medir FPS. Integrações opcionais de FTB Quests/FancyMenu na nova 1.21.1 precisam de ensaios com os respectivos mods presentes.
 
 O núcleo e os testes compartilhados são conferidos por `python scripts/sync_shared_core.py`. Propagação explícita: `--write`. APIs de renderização, entrada, NBT e mixins ficam nos adaptadores; o script não sobrescreve esses adaptadores.
 
@@ -45,8 +45,8 @@ Para ampliar o suporte, o próximo grupo é Fabric/Forge/NeoForge entre 1.16 e 1
 Gradle usa JDK 25; a variante 1.20.1 precisa também de JDK 17. A 1.21.1 gera classes Java 21, e as variantes 26 usam Java 25. Em cada pasta de loader:
 
 ```powershell
-.\gradlew.bat build integrationTest -Pedition=normal '-Pmod_version=2.0.0-alpha.1-normal'
-.\gradlew.bat build integrationTest -Pedition=lite '-Pmod_version=2.0.0-alpha.1-lite'
+.\gradlew.bat build integrationTest -Pedition=normal '-Pmod_version=2.0.0-alpha.4-normal'
+.\gradlew.bat build integrationTest -Pedition=lite '-Pmod_version=2.0.0-alpha.4-lite'
 ```
 
 Na pasta Fabric 1.20.1 também estão disponíveis `optimizationBenchmark`, `persistenceBenchmark`, `modelComparisonFixtures` e `nativeOptimizationSmoke`. O último exige um diretório isolado com modelo/runtime já verificados; nunca use o cache de um jogador como diretório de ensaio.
