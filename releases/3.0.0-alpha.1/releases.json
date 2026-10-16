@@ -1,0 +1,134 @@
+[
+  {
+    "file": "traduzmods-fabric-1.20.1-normal-3.0.0-alpha.1.jar",
+    "loader": "fabric",
+    "minecraft": "1.20.1",
+    "java": 17,
+    "edition": "normal",
+    "version": "3.0.0-alpha.1-normal",
+    "bytes": 230928,
+    "sha256": "4e0d4e9fc787357eb44d18b277fa0c93e0a5550cf5f42a10544bbdabd5314edf",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-fabric-1.20.1-lite-3.0.0-alpha.1.jar",
+    "loader": "fabric",
+    "minecraft": "1.20.1",
+    "java": 17,
+    "edition": "lite",
+    "version": "3.0.0-alpha.1-lite",
+    "bytes": 230924,
+    "sha256": "e6f5a7ac277f4e03635a0005a206cb303afead7c0f8bae1e6fe1f3f762490164",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-fabric-1.21.1-normal-3.0.0-alpha.1.jar",
+    "loader": "fabric",
+    "minecraft": "1.21.1",
+    "java": 21,
+    "edition": "normal",
+    "version": "3.0.0-alpha.1-normal",
+    "bytes": 230934,
+    "sha256": "989d26971d969c29b06b3229887db247dd5f271cf9231a2603f507ec04b3f962",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-fabric-1.21.1-lite-3.0.0-alpha.1.jar",
+    "loader": "fabric",
+    "minecraft": "1.21.1",
+    "java": 21,
+    "edition": "lite",
+    "version": "3.0.0-alpha.1-lite",
+    "bytes": 230930,
+    "sha256": "b8049cb14f75c9caad4e0cef20d2c784763dbc76e4f380a59c558a8564ec8470",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-fabric-26.2-normal-3.0.0-alpha.1.jar",
+    "loader": "fabric",
+    "minecraft": "26.2",
+    "java": 25,
+    "edition": "normal",
+    "version": "3.0.0-alpha.1-normal",
+    "bytes": 229252,
+    "sha256": "7c47a9fa3c2d4062a0c26ae700d658344f725ce8c4552d6ceb9db93cd08e4d21",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-fabric-26.2-lite-3.0.0-alpha.1.jar",
+    "loader": "fabric",
+    "minecraft": "26.2",
+    "java": 25,
+    "edition": "lite",
+    "version": "3.0.0-alpha.1-lite",
+    "bytes": 229248,
+    "sha256": "e28fc183776f3364669aa2196795cdfe529c86c0d2dc4c95a2c4a0a283a2c2cb",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-neoforge-26.1.2-normal-3.0.0-alpha.1.jar",
+    "loader": "neoforge",
+    "minecraft": "26.1.2",
+    "java": 25,
+    "edition": "normal",
+    "version": "3.0.0-alpha.1-normal",
+    "bytes": 227002,
+    "sha256": "d306b06378b8a060fe0e64c768291cdd4d21eff219712fe8ac59789beb49622b",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-neoforge-26.1.2-lite-3.0.0-alpha.1.jar",
+    "loader": "neoforge",
+    "minecraft": "26.1.2",
+    "java": 25,
+    "edition": "lite",
+    "version": "3.0.0-alpha.1-lite",
+    "bytes": 226999,
+    "sha256": "e03e0b7000646aa456ee5959ab79672fcddb7c29f526277622eff2f2034ef690",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-neoforge-1.21.1-normal-3.0.0-alpha.1.jar",
+    "loader": "neoforge",
+    "minecraft": "1.21.1",
+    "java": 21,
+    "edition": "normal",
+    "version": "3.0.0-alpha.1-normal",
+    "bytes": 226386,
+    "sha256": "c8249578ca70db1b1cb9967de1b2a8f9973b9741e0a5c3edf8e983e7632603e3",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-neoforge-1.21.1-lite-3.0.0-alpha.1.jar",
+    "loader": "neoforge",
+    "minecraft": "1.21.1",
+    "java": 21,
+    "edition": "lite",
+    "version": "3.0.0-alpha.1-lite",
+    "bytes": 226383,
+    "sha256": "24aef7ad584cc1eedffff1ba532322783e60e11f5ae0b26f434063b8dad7b4d1",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-forge-1.20.1-normal-3.0.0-alpha.1.jar",
+    "loader": "forge",
+    "minecraft": "1.20.1",
+    "java": 17,
+    "edition": "normal",
+    "version": "3.0.0-alpha.1-normal",
+    "bytes": 228474,
+    "sha256": "e2b403d696ee03d8733bb3fa44eda8dfe401899ce9ddf144d0e0ec9537226ebf",
+    "integrationPassed": 106
+  },
+  {
+    "file": "traduzmods-forge-1.20.1-lite-3.0.0-alpha.1.jar",
+    "loader": "forge",
+    "minecraft": "1.20.1",
+    "java": 17,
+    "edition": "lite",
+    "version": "3.0.0-alpha.1-lite",
+    "bytes": 228471,
+    "sha256": "26da0f2fe0b040ea56855f2a609571fcd47e0e1dad6eddc918a298c27c2876cb",
+    "integrationPassed": 106
+  }
+]

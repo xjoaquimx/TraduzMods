@@ -1,0 +1,70 @@
+[
+  {
+    "platform": "neoforge-1.21.1",
+    "edition": "normal",
+    "exitCode": 0,
+    "tests": {
+      "passed": 96,
+      "failed": 0,
+      "failures": []
+    },
+    "file": "traduzmods-neoforge-1.21.1-normal-2.0.0-alpha.4.jar",
+    "sha256": "5e31c33c2210262671a281d979e022c682213754ec50c1d74bd1395ab082b70e",
+    "bytes": 214114,
+    "originalBinaryPreserved": true
+  },
+  {
+    "platform": "neoforge-1.21.1",
+    "edition": "lite",
+    "exitCode": 0,
+    "tests": {
+      "passed": 96,
+      "failed": 0,
+      "failures": []
+    },
+    "file": "traduzmods-neoforge-1.21.1-lite-2.0.0-alpha.4.jar",
+    "sha256": "f2163d4c54bee98f24ebb6dc636c68404f3721d6e542a942e8a1c634e98e71c2",
+    "bytes": 214111,
+    "originalBinaryPreserved": true
+  },
+  {
+    "platform": "forge-1.20.1",
+    "edition": "normal",
+    "exitCode": 0,
+    "tests": {
+      "passed": 96,
+      "failed": 0,
+      "failures": []
+    },
+    "forgeBuildVersion": "47.4.0",
+    "compatibleForgeRange": "[47.4.0,48)",
+    "pack": "Society: Sunlit Valley 4.1.5A",
+    "file": "traduzmods-forge-1.20.1-normal-2.0.0-alpha.4.jar",
+    "sha256": "428a927e24c75e4f52589821728933dc00904c26f477024890982198032f0b5d",
+    "bytes": 216238,
+    "actualMixinTargets": 14,
+    "actualSelectors": 38,
+    "actualShadowFields": 8,
+    "visualAcceptancePending": true,
+    "resourcePackFormat": 15,
+    "classesUnchangedAfterMetadataFix": 99,
+    "metadataFixVerifiedUtc": "2026-10-13T13:33:47.593008+00:00",
+    "originalBinaryPreserved": true
+  },
+  {
+    "platform": "forge-1.20.1",
+    "edition": "normal",
+    "exitCode": 0,
+    "tests": {
+      "passed": 96,
+      "failed": 0,
+      "failures": []
+    },
+    "guideMeVersion": "20.1.15",
+    "guideMeIntegrationPassed": true,
+    "file": "traduzmods-forge-1.20.1-normal-2.0.0-alpha.4-forge47.4.20-exodus.jar",
+    "sha256": "29f77fd6e0c71de88fee4d1b3eccbfa2590925d673273b1ef1784eb49865b236",
+    "bytes": 216044,
+    "originalBinaryPreserved": true
+  }
+]

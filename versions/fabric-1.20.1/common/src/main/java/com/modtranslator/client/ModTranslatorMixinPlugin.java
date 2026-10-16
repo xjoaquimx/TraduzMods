@@ -12,6 +12,16 @@ public final class ModTranslatorMixinPlugin implements IMixinConfigPlugin {
     public void onLoad(String name) {}
     public String getRefMapperConfig() {return null;}
     public boolean shouldApplyMixin(String target,String mixin) {
+        if(mixin.contains(".AgentCraft")) {
+            try {
+                ClassNode type=MixinService.getService().getBytecodeProvider().getClassNode(target,true);
+                if(mixin.endsWith("BoardMixin"))return type.fields.stream().anyMatch(f->f.name.equals("taskSeq")&&f.desc.equals("J"))&&type.methods.stream().anyMatch(m->m.name.equals("sync"))&&type.methods.stream().anyMatch(m->m.name.equals("titleText"));
+                if(mixin.endsWith("ScreenMixin"))return type.fields.stream().anyMatch(f->f.name.equals("revision")&&f.desc.equals("J"))&&type.methods.stream().anyMatch(m->m.name.equals("refresh"));
+                if(mixin.endsWith("WorldTextMixin"))return type.methods.stream().anyMatch(m->m.name.equals("submitText")&&m.desc.contains("FormattedCharSequence;"));
+                return java.util.List.of("ellipsize","wrap","wrapPlain").stream().allMatch(name->type.methods.stream().anyMatch(m->m.name.equals(name)));
+            }catch(Exception absent){return false;}
+        }
+
         if(mixin.endsWith(".GuideMeDocumentMixin")) {
             try {
                 ClassNode type=MixinService.getService().getBytecodeProvider().getClassNode(target,true);

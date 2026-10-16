@@ -1,0 +1,21 @@
+{
+  "version": "0.2.1",
+  "archivedOn": "2026-10-16",
+  "binaryRebuilt": false,
+  "newPerformanceBenchmark": false,
+  "relatedSourceCommit": null,
+  "sourceTagPolicy": "Related development commit for alpha.2/alpha.3; otherwise archival publication commit. A byte-for-byte reproducible source mapping is not asserted.",
+  "validation": "JAR metadata and SHA-256 checked now. Historical test counts are included only when an existing report matches the original binary hash.",
+  "artifacts": [
+    {
+      "file": "traduzmods-fabric-0.2.1-mc26.2.jar",
+      "sha256": "3ff759020ad16842a80c2cdc7a4eaa4279f9f97be2f3de2f9820a663e2e0f4a8",
+      "bytes": 110523,
+      "loader": "fabric",
+      "minecraftRequirement": "26.2",
+      "version": "0.2.1",
+      "edition": null,
+      "originalBinaryPreserved": true
+    }
+  ]
+}

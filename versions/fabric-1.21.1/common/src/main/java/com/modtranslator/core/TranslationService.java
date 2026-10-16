@@ -121,9 +121,10 @@ public final class TranslationService {
             atomicWrite(file,GSON.toJson(config));
             LocalTranslationClient.setUserPaused(config.translationPaused);
             instance=new TranslationService(config,directory,ids);
-            LOG.log(System.Logger.Level.INFO,"TraduzMods 2.0.0-alpha.4 {0} automatic worker initialized; {1} cached keys, {2} installed mods.",TranslationEdition.current().id(),instance.cache.size(),ids.size());
+            LOG.log(System.Logger.Level.INFO,"TraduzMods 3.0.0-alpha.1 {0} automatic worker initialized; {1} cached keys, {2} installed mods.",TranslationEdition.current().id(),instance.cache.size(),ids.size());
         } catch(Exception e) { LOG.log(System.Logger.Level.ERROR,"Translation initialization failed.",e); }
     }
+    public static boolean isModInstalled(String id){TranslationService s=instance;return s!=null&&s.modIds.contains(id);}
     public static boolean isPortugueseActive() { return portugueseActive; }
     public static TranslationProgress translationProgress() {
         TranslationService s=instance;
@@ -564,7 +565,7 @@ public final class TranslationService {
             }
             long queued=queueVersion.get();
             if(force||checkpoint||(queued!=savedQueueVersion&&now-lastQueueSnapshot>=10_000&&visibleTracking.isEmpty())){atomicWrite(directory.resolve("pending.json"),CACHE_JSON.toJson(jobs.values()));savedQueueVersion=queued;lastQueueSnapshot=now;}
-            JsonObject status=new JsonObject(); status.addProperty("version","2.0.0-alpha.4");status.addProperty("paragraphReuseHits",LocalTranslationClient.paragraphReuseCount());status.addProperty("translationEngine","local-hy-mt2");status.addProperty("economyOnDemand",provider.isEconomyMode());status.addProperty("ptBrActive",portugueseActive);status.addProperty("installedMods",modIds.size());status.addProperty("discoveredMissing",discovered);status.addProperty("cachedUniqueSources",bySource.size());status.addProperty("pending",jobs.size());status.addProperty("translatedThisRun",commits);status.addProperty("provider",providerState);status.addProperty("local",provider.status());status.addProperty("lastFailure",lastFailure);status.addProperty("updatedAt",java.time.Instant.now().toString());
+            JsonObject status=new JsonObject(); status.addProperty("version","3.0.0-alpha.1");status.addProperty("paragraphReuseHits",LocalTranslationClient.paragraphReuseCount());status.addProperty("translationEngine","local-hy-mt2");status.addProperty("economyOnDemand",provider.isEconomyMode());status.addProperty("ptBrActive",portugueseActive);status.addProperty("installedMods",modIds.size());status.addProperty("discoveredMissing",discovered);status.addProperty("cachedUniqueSources",bySource.size());status.addProperty("pending",jobs.size());status.addProperty("translatedThisRun",commits);status.addProperty("provider",providerState);status.addProperty("local",provider.status());status.addProperty("lastFailure",lastFailure);status.addProperty("updatedAt",java.time.Instant.now().toString());
             status.addProperty("translationQualityVersion",TRANSLATION_QUALITY_VERSION);status.addProperty("nativeTerminologyEntries",GameTranslationContext.nativeTermCount());
             status.addProperty("storageMode","journal");status.addProperty("localBackend",LocalTranslationClient.backend());status.addProperty("lastTranslationMs",lastTranslationMs);status.addProperty("lastCheckpointMillis",lastCheckpoint);
             status.addProperty("localMemoryBudgetMiB",LocalResourcePolicy.currentMemoryBudgetMiB());status.addProperty("localIdleUnloadSeconds",LocalResourcePolicy.IDLE_MILLIS/1000);status.addProperty("pretranslateWhilePlaying",TranslationEdition.current().allowsBackgroundWhilePlaying());

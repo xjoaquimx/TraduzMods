@@ -1,0 +1,11 @@
+SKIP absent optional: com/aetherteam/aetherii/client/gui/screen/AlphaInfoScreen
+SKIP absent optional: com/aetherteam/aetherii/client/gui/screen/guidebook/DiscoveryDescriptionScreen
+SKIP absent optional: dev/agentcraft/client/taskwall/TaskBoard
+SKIP absent optional: dev/agentcraft/client/agents/AgentCardScreen
+SKIP absent optional: dev/agentcraft/client/ui/TextUtil
+SKIP absent optional: de/keksuccino/fancymenu/util/rendering/text/markdown/MarkdownRenderer
+SKIP absent optional: dev/ftb/mods/ftbquests/quest/Quest
+SKIP absent optional: dev/ftb/mods/ftbquests/quest/QuestObjectBase
+SKIP absent optional: dev/ftb/mods/ftbquests/client/gui/quests/ViewQuestPanel
+SKIP absent optional: guideme/internal/screen/DocumentScreen
+PASS NeoForge 1.21.1: 10 actual mixin target classes, 29 selectors, 3 shadow fields.

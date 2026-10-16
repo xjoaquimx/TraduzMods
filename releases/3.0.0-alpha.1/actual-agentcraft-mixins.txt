@@ -1,0 +1,8 @@
+SKIP absent optional: com/aetherteam/aetherii/client/gui/screen/AlphaInfoScreen
+SKIP absent optional: com/aetherteam/aetherii/client/gui/screen/guidebook/DiscoveryDescriptionScreen
+SKIP absent optional: de/keksuccino/fancymenu/util/rendering/text/markdown/MarkdownRenderer
+SKIP absent optional: dev/ftb/mods/ftbquests/quest/Quest
+SKIP absent optional: dev/ftb/mods/ftbquests/quest/QuestObjectBase
+SKIP absent optional: dev/ftb/mods/ftbquests/client/gui/quests/ViewQuestPanel
+SKIP absent optional: guideme/internal/screen/DocumentScreen
+PASS Fabric 26.2 + AgentCraft: 14 actual mixin target classes, 36 selectors, 6 shadow fields.

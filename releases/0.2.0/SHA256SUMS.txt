@@ -1,0 +1,2 @@
+b6288a6beb5b8997c8c8444a67592a41130c7819ff8b3a1ec961032bfcd6e76d  traduzmods-fabric-0.2.0.jar
+972605ca2de8f3ee9deef8e2663b8b88f9e0d855a9cccfb9538490dc7f524348  traduzmods-neoforge-0.2.0.jar

@@ -1,0 +1,278 @@
+{
+  "version": "3.0.0-alpha.1",
+  "testedOn": "2026-10-16",
+  "hardware": {
+    "testMachine": "Project author personal PC",
+    "cpu": "AMD Ryzen 5 5600X",
+    "physicalCores": 6,
+    "logicalProcessors": 12,
+    "installedRamGiB": 16,
+    "gpu": "NVIDIA GeForce RTX 5060",
+    "reportedVramMiB": 8151,
+    "os": "Microsoft Windows 11 Pro"
+  },
+  "integrationPassed": 1272,
+  "integrationFailed": 0,
+  "uniqueCasesPerVariant": 106,
+  "variantCount": 12,
+  "sharedSourceComparisons": 200,
+  "testsUseMockProvider": true,
+  "newNativeModelBenchmark": false,
+  "visualAcceptancePending": true,
+  "runtimeEvidence": {
+    "versionActuallyInstalled": "2.0.0-alpha.5-normal",
+    "pack": "Fabulously Optimized",
+    "minecraft": "26.2",
+    "loader": "Fabric 0.19.5",
+    "agentcraft": "0.1.0+mc26.2.local",
+    "successfulStartup": true,
+    "scope": "Startup and optional-mixin loading checked on the alpha.5 predecessor. The 3.0 label is rebuilt separately; no new full visual acceptance or FPS benchmark is asserted."
+  },
+  "optionalMixinBytecodeValidation": {
+    "platform": "fabric-26.2",
+    "targets": 14,
+    "selectors": 36,
+    "shadowFields": 6,
+    "log": "actual-agentcraft-mixins.txt"
+  },
+  "classTargets": {
+    "fabric-1.20.1": 17,
+    "forge-1.20.1": 17,
+    "fabric-1.21.1": 21,
+    "neoforge-1.21.1": 21,
+    "fabric-26.2": 25,
+    "neoforge-26.1.2": 25
+  },
+  "forgeMinimum": "47.4.0",
+  "forgeResourcePackFormat": 15,
+  "results": [
+    {
+      "platform": "fabric-1.20.1",
+      "loader": "fabric",
+      "minecraft": "1.20.1",
+      "java": 17,
+      "edition": "normal",
+      "version": "3.0.0-alpha.1-normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.20.1-normal-3.0.0-alpha.1.jar",
+      "sha256": "4e0d4e9fc787357eb44d18b277fa0c93e0a5550cf5f42a10544bbdabd5314edf",
+      "bytes": 230928
+    },
+    {
+      "platform": "fabric-1.20.1",
+      "loader": "fabric",
+      "minecraft": "1.20.1",
+      "java": 17,
+      "edition": "lite",
+      "version": "3.0.0-alpha.1-lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.20.1-lite-3.0.0-alpha.1.jar",
+      "sha256": "e6f5a7ac277f4e03635a0005a206cb303afead7c0f8bae1e6fe1f3f762490164",
+      "bytes": 230924
+    },
+    {
+      "platform": "fabric-1.21.1",
+      "loader": "fabric",
+      "minecraft": "1.21.1",
+      "java": 21,
+      "edition": "normal",
+      "version": "3.0.0-alpha.1-normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.21.1-normal-3.0.0-alpha.1.jar",
+      "sha256": "989d26971d969c29b06b3229887db247dd5f271cf9231a2603f507ec04b3f962",
+      "bytes": 230934
+    },
+    {
+      "platform": "fabric-1.21.1",
+      "loader": "fabric",
+      "minecraft": "1.21.1",
+      "java": 21,
+      "edition": "lite",
+      "version": "3.0.0-alpha.1-lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-1.21.1-lite-3.0.0-alpha.1.jar",
+      "sha256": "b8049cb14f75c9caad4e0cef20d2c784763dbc76e4f380a59c558a8564ec8470",
+      "bytes": 230930
+    },
+    {
+      "platform": "fabric-26.2",
+      "loader": "fabric",
+      "minecraft": "26.2",
+      "java": 25,
+      "edition": "normal",
+      "version": "3.0.0-alpha.1-normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-26.2-normal-3.0.0-alpha.1.jar",
+      "sha256": "7c47a9fa3c2d4062a0c26ae700d658344f725ce8c4552d6ceb9db93cd08e4d21",
+      "bytes": 229252
+    },
+    {
+      "platform": "fabric-26.2",
+      "loader": "fabric",
+      "minecraft": "26.2",
+      "java": 25,
+      "edition": "lite",
+      "version": "3.0.0-alpha.1-lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-fabric-26.2-lite-3.0.0-alpha.1.jar",
+      "sha256": "e28fc183776f3364669aa2196795cdfe529c86c0d2dc4c95a2c4a0a283a2c2cb",
+      "bytes": 229248
+    },
+    {
+      "platform": "neoforge-26.1.2",
+      "loader": "neoforge",
+      "minecraft": "26.1.2",
+      "java": 25,
+      "edition": "normal",
+      "version": "3.0.0-alpha.1-normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-neoforge-26.1.2-normal-3.0.0-alpha.1.jar",
+      "sha256": "d306b06378b8a060fe0e64c768291cdd4d21eff219712fe8ac59789beb49622b",
+      "bytes": 227002
+    },
+    {
+      "platform": "neoforge-26.1.2",
+      "loader": "neoforge",
+      "minecraft": "26.1.2",
+      "java": 25,
+      "edition": "lite",
+      "version": "3.0.0-alpha.1-lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-neoforge-26.1.2-lite-3.0.0-alpha.1.jar",
+      "sha256": "e03e0b7000646aa456ee5959ab79672fcddb7c29f526277622eff2f2034ef690",
+      "bytes": 226999
+    },
+    {
+      "platform": "neoforge-1.21.1",
+      "loader": "neoforge",
+      "minecraft": "1.21.1",
+      "java": 21,
+      "edition": "normal",
+      "version": "3.0.0-alpha.1-normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-neoforge-1.21.1-normal-3.0.0-alpha.1.jar",
+      "sha256": "c8249578ca70db1b1cb9967de1b2a8f9973b9741e0a5c3edf8e983e7632603e3",
+      "bytes": 226386
+    },
+    {
+      "platform": "neoforge-1.21.1",
+      "loader": "neoforge",
+      "minecraft": "1.21.1",
+      "java": 21,
+      "edition": "lite",
+      "version": "3.0.0-alpha.1-lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-neoforge-1.21.1-lite-3.0.0-alpha.1.jar",
+      "sha256": "24aef7ad584cc1eedffff1ba532322783e60e11f5ae0b26f434063b8dad7b4d1",
+      "bytes": 226383
+    },
+    {
+      "platform": "forge-1.20.1",
+      "loader": "forge",
+      "minecraft": "1.20.1",
+      "java": 17,
+      "edition": "normal",
+      "version": "3.0.0-alpha.1-normal",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-forge-1.20.1-normal-3.0.0-alpha.1.jar",
+      "sha256": "e2b403d696ee03d8733bb3fa44eda8dfe401899ce9ddf144d0e0ec9537226ebf",
+      "bytes": 228474
+    },
+    {
+      "platform": "forge-1.20.1",
+      "loader": "forge",
+      "minecraft": "1.20.1",
+      "java": 17,
+      "edition": "lite",
+      "version": "3.0.0-alpha.1-lite",
+      "exitCode": 0,
+      "tests": {
+        "passed": 106,
+        "failed": 0,
+        "failures": []
+      },
+      "file": "traduzmods-forge-1.20.1-lite-3.0.0-alpha.1.jar",
+      "sha256": "26da0f2fe0b040ea56855f2a609571fcd47e0e1dad6eddc918a298c27c2876cb",
+      "bytes": 228471
+    }
+  ],
+  "limits": [
+    "Not every modpack was launched with every edition.",
+    "AgentCraft world-space integration was checked against the installed Fabric 26.2 local build; absent/incompatible optional APIs are skipped.",
+    "Historical test results are archived separately and are not new tests of this release.",
+    "Unrelated catalog entries can still fail translation-token validation; no complete-catalog coverage claim."
+  ],
+  "additionalMixinBytecodeValidation": [
+    {
+      "platform": "neoforge-1.21.1",
+      "targets": 10,
+      "selectors": 29,
+      "shadowFields": 3,
+      "optionalModsSupplied": false,
+      "log": "actual-neoforge-1.21.1-mixins.txt"
+    },
+    {
+      "platform": "forge-1.20.1",
+      "targets": 14,
+      "selectors": 38,
+      "shadowFields": 8,
+      "optionalModsSupplied": true,
+      "log": "actual-forge-1.20.1-mixins.txt"
+    }
+  ]
+}

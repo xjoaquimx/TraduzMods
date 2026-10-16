@@ -1,0 +1,4 @@
+5e31c33c2210262671a281d979e022c682213754ec50c1d74bd1395ab082b70e  traduzmods-neoforge-1.21.1-normal-2.0.0-alpha.4.jar
+f2163d4c54bee98f24ebb6dc636c68404f3721d6e542a942e8a1c634e98e71c2  traduzmods-neoforge-1.21.1-lite-2.0.0-alpha.4.jar
+428a927e24c75e4f52589821728933dc00904c26f477024890982198032f0b5d  traduzmods-forge-1.20.1-normal-2.0.0-alpha.4.jar
+29f77fd6e0c71de88fee4d1b3eccbfa2590925d673273b1ef1784eb49865b236  traduzmods-forge-1.20.1-normal-2.0.0-alpha.4-forge47.4.20-exodus.jar

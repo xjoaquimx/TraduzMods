@@ -16,6 +16,7 @@ import java.util.function.BooleanSupplier;
 
 /** Isolated integration tests. Production service with an injected in-memory local provider and resource packs. */
 class TranslationServiceIntegrationTest {
+    public record FakeAgentCraftTask(String title) {}
     static final class FakeGuideText {
         String text; FakeGuideText(String text){this.text=text;}
         public String getText(){return text;} public void setText(String text){this.text=text;}
@@ -66,6 +67,15 @@ class TranslationServiceIntegrationTest {
         protected FakeGuideDocument getDocument(){return document;}
         private void updateScreenLayout(){layouts++;com.modtranslator.client.GuideMePageRefresh.refresh(this);}
         String title(){return ((FakeGuideText)pageTitle.content.get(0)).text;}
+    }
+    static final class FakePrivateGuideDocument {
+        final List<FakeGuideParagraph> blocks=new ArrayList<>();int invalidations;
+        public List<FakeGuideParagraph> getChildren(){return blocks;}
+        private void invalidateLayout(){invalidations++;}
+    }
+    static final class FakePrivateGuideScreen {
+        final FakePrivateGuideDocument document=new FakePrivateGuideDocument();boolean documentLayoutInvalid;
+        protected FakePrivateGuideDocument getDocument(){return document;}
     }
     static final Gson GSON = new Gson();
     static final List<String> failures = new ArrayList<>();
@@ -1405,6 +1415,88 @@ class TranslationServiceIntegrationTest {
             com.modtranslator.client.TranslationPanelMotion.reset();
         });
 
+        test("compact_status_includes_background_queue_and_never_claims_complete_with_pending_work",()->{
+            var progress=new TranslationService.TranslationProgress(true,false,"idle",559,559,1166,0,"normal");
+            var c=com.modtranslator.client.TranslationStatusBar.counters(progress);
+            check(c.total()==1725&&c.percent()==32&&c.queued()==1166,"on-demand progress hides background work");
+            check(c.savedText().equals("559/1.725")&&c.queueText().equals("1.166 na fila"),"compact counters stale or incorrectly formatted");
+            var edge=com.modtranslator.client.TranslationStatusBar.counters(new TranslationService.TranslationProgress(true,true,"translating",Long.MAX_VALUE,Long.MAX_VALUE,1,0,"normal"));
+            check(edge.total()==Long.MAX_VALUE&&edge.percent()==99,"counter overflow or premature 100 percent");
+        });
+        test("translation_refresh_gate_coalesces_commits_without_losing_latest_revision",()->{
+            var gate=new com.modtranslator.client.TranslationRefreshGate();
+            check(gate.changed(1,1000_000_000L)&&!gate.changed(1,1600_000_000L),"unchanged layout revision rebuilds");
+            check(gate.changed(2,1600_000_000L)&&!gate.changed(3,1700_000_000L)&&gate.changed(4,2100_000_000L),"refresh throttle loses latest model commit");
+        });
+        test("technical_paths_flags_tags_versions_and_inline_commands_roundtrip",()->{
+            String source="Highlight #tags in src/tags.ts with --tag=tools and `npm install chalk@5`; release v0.3.0.";
+            var protectedText=TextProtection.protect(source);
+            for(String token:List.of("#tags","src/tags.ts","--tag=tools","`npm install chalk@5`","v0.3.0"))check(protectedText.originals().contains(token),"unprotected technical token: "+token);
+            check(protectedText.restore(protectedText.value().replace("Highlight","Destaque")).equals(source.replace("Highlight","Destaque")),"technical text did not roundtrip");
+        });
+        test("AgentCraft_commands_and_agent_names_are_never_queued",()->{
+            try(Mock mock=new Mock()){
+                init("agentcraft-protected-input",mock,true);scan(Map.of(),Map.of(),Map.of());
+                for(String text:List.of("Wren","Marlow","npm install chalk@5","Bash: npm install chalk@5","git checkout main"))check(com.modtranslator.client.AgentCraftTranslation.text(text).equals(text),"command/name changed");
+                check(jobs().isEmpty(),"opaque agent command/name sent to translation");
+            }
+        });
+        test("AgentCraft_short_controls_translate_from_cache_without_model_and_respect_toggle",()->{
+            try(Mock mock=new Mock()){
+                init("agentcraft-labels",mock,true);scan(Map.of(),Map.of(),Map.of());
+                await(()->com.modtranslator.client.AgentCraftTranslation.text("Pause").equals("Pausar")&&com.modtranslator.client.AgentCraftTranslation.text("TODO").equals("A FAZER"),"short labels were ignored");
+                check(mock.sent.isEmpty(),"canonical UI labels started inference");
+                TranslationService.setCachedTranslationDisplayEnabled(false);
+                check(com.modtranslator.client.AgentCraftTranslation.text("Pause").equals("Pause"),"cache display toggle ignored by optional integration");
+            }
+        });
+        test("AgentCraft_technical_titles_translate_whole_before_wrapping",()->{
+            try(Mock mock=new Mock()){
+                init("agentcraft-titles",mock,true);scan(Map.of(),Map.of(),Map.of());
+                mock.translation=t->t.replace("Highlight","Destaque").replace("list output","saída da lista");
+                String source="Highlight #tags in list output";
+                await(()->com.modtranslator.client.AgentCraftTranslation.text(source).equals("Destaque #tags in saída da lista"),"trusted technical title not translated");
+                check(mock.sent.stream().anyMatch(TextProtection.protect(source).value()::equals),"source was fragmented before queuing");
+            }
+        });
+        test("AgentCraft_board_title_preserves_inline_commands_and_source_record",()->{
+            try(Mock mock=new Mock()){
+                init("agentcraft-board-title",mock,true);scan(Map.of(),Map.of(),Map.of());
+                mock.translation=t->t.replace("help text", "texto de ajuda");
+                var task=new FakeAgentCraftTask("README + help text for `notes list --tag` in src/tags.ts");
+                await(()->com.modtranslator.client.AgentCraftTranslation.title(task).contains("texto de ajuda"),"board title did not update");
+                check(task.title().equals("README + help text for `notes list --tag` in src/tags.ts"),"integration mutated protocol record");
+                check(com.modtranslator.client.AgentCraftTranslation.title(task).contains("notes list --tag"),"command modified in board title");
+            }
+        });
+        test("AgentCraft_prelocalized_prose_does_not_start_inference",()->{
+            try(Mock mock=new Mock()){
+                init("agentcraft-native-prose",mock,true);scan(Map.of(),Map.of(),Map.of());
+                String text="Demonstrar o AgentCraft neste repositório";
+                check(com.modtranslator.client.AgentCraftTranslation.text(text).equals(text)&&jobs().isEmpty(),"Portuguese prose requeued");
+                check(ModTextPolicy.canonicalUi("2 doing").equals("2 em andamento")&&ModTextPolicy.canonicalUi("21 lines").equals("21 linhas"),"short HUD counters ignored");
+            }
+        });
+        test("AgentCraft_multiword_display_names_are_opaque_and_persist_in_protection",()->{
+            try(Mock mock=new Mock()){
+                init("agentcraft-names",mock,true);scan(Map.of(),Map.of(),Map.of());
+                ModTextPolicy.registerDisplayNames(List.of("Stone Builder"));
+                check(com.modtranslator.client.AgentCraftTranslation.text("Stone Builder").equals("Stone Builder")&&jobs().isEmpty(),"multiword agent name translated");
+                check(TextProtection.protect("Stone Builder wants to install a dependency").originals().contains("Stone Builder"),"agent name inside prose not protected");
+            }finally{ModTextPolicy.registerDisplayNames(List.of());}
+        });
+        test("AgentCraft_status_bar_avoids_goal_HUD_without_changing_input_guards",()->{
+            try(Mock mock=new Mock()){
+                init("agentcraft-hud-offset",mock,true);Object svc=service();
+                @SuppressWarnings("unchecked") Set<String> ids=(Set<String>)value(svc,"modIds");
+                set(svc,"modIds",Set.of("testmod","agentcraft"));
+                try {
+                    check(com.modtranslator.client.TranslationProgressControl.verticalOffset()==48,"goal bar collision not avoided");
+                    var button=com.modtranslator.client.TranslationProgressControl.bounds(854,480);
+                    check(button.y()>=100&&!com.modtranslator.client.TranslationProgressControl.hit(false,false,true,854,480,button.x()+2,button.y()+2),"shifted controls steal world input");
+                }finally{set(svc,"modIds",ids);}
+            }
+        });
         test("compact_on_demand_RAM_admission_requires_budget_and_game_reserve",()->{
             check(LocalResourcePolicy.ON_DEMAND_MEMORY_MIB==1792&&LocalResourcePolicy.ON_DEMAND_RESERVE_MIB==384,"compact local allocation changes protected game reserve");
             check(LocalResourcePolicy.minimumOnDemandFreeMemoryMiB()==2176,"compact admission omits model budget or reserve");
@@ -1558,6 +1650,15 @@ class TranslationServiceIntegrationTest {
                 FakeGuideScreen view=new FakeGuideScreen();FakeGuideText left=new FakeGuideText(originals.get(0)),link=new FakeGuideText(originals.get(1)),right=new FakeGuideText(originals.get(2));
                 view.document.blocks.add(new FakeGuideParagraph(List.of(left,new FakeGuideSpan(List.of(link)),right)));
                 await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(view);return left.text.startsWith("Cartões de distribuição")&&link.text.equals("células de armazenamento")&&right.text.equals(". Eles dividem a célula.");},"ordered XML erased link instead of using fallback");
+            }
+        });
+
+        test("GuideMe_older_private_layout_invalidation_refreshes_visible_text",()->{
+            try(Mock mock=new Mock()) {
+                init("guide-private-layout",mock,true);scan(Map.of(),Map.of(),Map.of());
+                FakePrivateGuideScreen screen=new FakePrivateGuideScreen();FakeGuideText text=new FakeGuideText("The Charger provides power.");
+                screen.document.blocks.add(new FakeGuideParagraph(List.of(text)));
+                await(()->{com.modtranslator.client.GuideMePageRefresh.refresh(screen);return text.text.startsWith("PT: ")&&screen.document.invalidations>0&&screen.documentLayoutInvalid;},"private older GuideMe invalidation disabled live translation");
             }
         });
 

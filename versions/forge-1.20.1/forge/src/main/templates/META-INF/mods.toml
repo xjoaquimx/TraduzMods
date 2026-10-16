@@ -1,0 +1,20 @@
+modLoader="javafml"
+loaderVersion="[47,)"
+license="${mod_license}"
+[[mods]]
+modId="${mod_id}"
+version="${mod_version}"
+displayName="${mod_name}"
+description="Traducao automatica local de textos de mods para portugues brasileiro com Hy-MT2."
+[[dependencies.modtranslator]]
+modId="forge"
+mandatory=true
+versionRange="[${forge_version},48)"
+ordering="NONE"
+side="CLIENT"
+[[dependencies.modtranslator]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.20.1]"
+ordering="NONE"
+side="CLIENT"

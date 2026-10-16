@@ -1,0 +1,2 @@
+2d5e81e19a70f8ea6c7c71fbcda58440331b84dd67337672abb898c93704b764  traduzmods-fabric-0.2.2-mc1.20.1.jar
+2f06e229744dc3f6ff9dc3b3e2a70a4c9670a13677f2f031b9db4a78f11f0c51  traduzmods-fabric-0.2.2-mc26.2.jar

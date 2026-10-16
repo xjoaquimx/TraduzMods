@@ -1,0 +1,122 @@
+[
+  {
+    "file": "traduzmods-fabric-1.20.1-lite-2.0.0-alpha.2.jar",
+    "sha256": "34ec68ab58acd67970383e3567198f42722b3a8948a24d5f825e51e529fa0ab9",
+    "bytes": 213012,
+    "loader": "fabric",
+    "minecraftRequirement": "~1.20.1",
+    "version": "2.0.0-alpha.2-lite",
+    "edition": "lite",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  },
+  {
+    "file": "traduzmods-fabric-1.20.1-normal-2.0.0-alpha.2.jar",
+    "sha256": "7dd1756a6c1a21eaf5c34cfbd754bb03f3a23ff859cfc59cbd479194635801ae",
+    "bytes": 213016,
+    "loader": "fabric",
+    "minecraftRequirement": "~1.20.1",
+    "version": "2.0.0-alpha.2-normal",
+    "edition": "normal",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  },
+  {
+    "file": "traduzmods-fabric-1.21.1-lite-2.0.0-alpha.2.jar",
+    "sha256": "682c58f06108e469c7b879726284455a1a279e7787a0074bc7040dc4be56c5f4",
+    "bytes": 213020,
+    "loader": "fabric",
+    "minecraftRequirement": "~1.21.1",
+    "version": "2.0.0-alpha.2-lite",
+    "edition": "lite",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  },
+  {
+    "file": "traduzmods-fabric-1.21.1-normal-2.0.0-alpha.2.jar",
+    "sha256": "93a5541c2926249e0672176ee4963b395805b3f21fbb6a094bd966ad4243335f",
+    "bytes": 213023,
+    "loader": "fabric",
+    "minecraftRequirement": "~1.21.1",
+    "version": "2.0.0-alpha.2-normal",
+    "edition": "normal",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  },
+  {
+    "file": "traduzmods-fabric-26.2-lite-2.0.0-alpha.2.jar",
+    "sha256": "5004150f0e498da602b17f39db0cdbdd03a030a82a3742e2667c15ca04def0e1",
+    "bytes": 210570,
+    "loader": "fabric",
+    "minecraftRequirement": "26.2",
+    "version": "2.0.0-alpha.2-lite",
+    "edition": "lite",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  },
+  {
+    "file": "traduzmods-fabric-26.2-normal-2.0.0-alpha.2.jar",
+    "sha256": "f6a527b6cb1bd8f2fe879ddd7e53af8f6421b00b461d2e29d2f67fd85f6f42a0",
+    "bytes": 210573,
+    "loader": "fabric",
+    "minecraftRequirement": "26.2",
+    "version": "2.0.0-alpha.2-normal",
+    "edition": "normal",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  },
+  {
+    "file": "traduzmods-neoforge-26.1.2-lite-2.0.0-alpha.2.jar",
+    "sha256": "9b045cb69000359bd0f195b3cf6e5f16334be2a894475d27a605cdbb95f85ee9",
+    "bytes": 209344,
+    "loader": "neoforge",
+    "minecraftRequirement": "[26.1.2]",
+    "version": "2.0.0-alpha.2-lite",
+    "edition": "lite",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  },
+  {
+    "file": "traduzmods-neoforge-26.1.2-normal-2.0.0-alpha.2.jar",
+    "sha256": "35f5824685c91382515bb8f0dbee581b5d725405582692b5d2322754ab8b156c",
+    "bytes": 209348,
+    "loader": "neoforge",
+    "minecraftRequirement": "[26.1.2]",
+    "version": "2.0.0-alpha.2-normal",
+    "edition": "normal",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 91,
+      "failed": 0,
+      "failures": []
+    }
+  }
+]

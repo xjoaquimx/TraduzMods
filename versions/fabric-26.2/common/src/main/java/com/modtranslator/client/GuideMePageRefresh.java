@@ -49,7 +49,7 @@ public final class GuideMePageRefresh {
             state.rememberRows(rows);
             state.rebuilding = true;
             if (update(document, 0)) {
-                Method invalidate = method(document.getClass(), "invalidateLayout");
+                Method invalidate = declaredMethod(document.getClass(), "invalidateLayout");
                 if (invalidate == null) throw new NoSuchMethodException("Guide layout invalidation");
                 invalidate.invoke(document); access.invalid.setBoolean(screen, true);
             }

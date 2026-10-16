@@ -1,0 +1,7 @@
+SKIP absent optional: com/aetherteam/aetherii/client/gui/screen/AlphaInfoScreen
+SKIP absent optional: com/aetherteam/aetherii/client/gui/screen/guidebook/DiscoveryDescriptionScreen
+SKIP absent optional: dev/agentcraft/client/taskwall/TaskBoard
+SKIP absent optional: dev/agentcraft/client/agents/AgentCardScreen
+SKIP absent optional: dev/agentcraft/client/ui/TextUtil
+SKIP absent optional: guideme/internal/screen/DocumentScreen
+PASS Forge 1.20.1: 14 actual mixin target classes, 38 selectors, 8 shadow fields.

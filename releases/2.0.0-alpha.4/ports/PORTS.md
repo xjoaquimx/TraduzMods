@@ -1,0 +1,3 @@
+# Portes históricos adicionais da alpha.4
+
+NeoForge 1.21.1 Lite/Normal e Forge 1.20.1 Normal. Binários originais, sem recompilação; 96 testes históricos por artefato. A variante Forge sem sufixo contém o ajuste de metadados e pack.mcmeta para Forge 47.4.0 (Society: Sunlit Valley). A variante com sufixo forge47.4.20-exodus é a build anterior, com mínimo 47.4.20 e o aviso de ResourcePackInfo posteriormente corrigido. São anexos adicionais; os oito JARs e o manifesto da publicação original permanecem preservados. As fontes na tag original alpha.4 não incluem esses portes posteriores. Use a 3.0.0-alpha.1 para o código consolidado e as duas edições atuais.

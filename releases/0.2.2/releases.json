@@ -1,0 +1,22 @@
+[
+  {
+    "file": "traduzmods-fabric-0.2.2-mc1.20.1.jar",
+    "sha256": "2d5e81e19a70f8ea6c7c71fbcda58440331b84dd67337672abb898c93704b764",
+    "bytes": 131919,
+    "loader": "fabric",
+    "minecraftRequirement": "~1.20.1",
+    "version": "0.2.2",
+    "edition": null,
+    "originalBinaryPreserved": true
+  },
+  {
+    "file": "traduzmods-fabric-0.2.2-mc26.2.jar",
+    "sha256": "2f06e229744dc3f6ff9dc3b3e2a70a4c9670a13677f2f031b9db4a78f11f0c51",
+    "bytes": 114682,
+    "loader": "fabric",
+    "minecraftRequirement": "26.2",
+    "version": "0.2.2",
+    "edition": null,
+    "originalBinaryPreserved": true
+  }
+]

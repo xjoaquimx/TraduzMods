@@ -1,0 +1,74 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev.legacyforge' version '2.0.148'
+}
+version = mod_version
+group = mod_group_id
+base { archivesName = 'traduzmods-forge' }
+sourceSets.main.java.srcDir('../common/src/main/java')
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+legacyForge {
+    enable {
+        forgeVersion = minecraft_version + '-' + forge_version
+        disableRecompilation = true
+    }
+    runs { client { client() } }
+    mods { "${mod_id}" { sourceSet(sourceSets.main) } }
+}
+repositories { maven { url = 'https://repo.spongepowered.org/repository/maven-public/' } }
+dependencies { annotationProcessor 'org.spongepowered:mixin:0.8.5:processor' }
+mixin {
+    add sourceSets.main, 'modtranslator.refmap.json'
+    config 'modtranslator.mixins.json'
+}
+jar {
+    from('../LICENSE')
+    manifest.attributes(['MixinConfigs': 'modtranslator.mixins.json'])
+}
+def generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    def replacements = [mod_id:mod_id,mod_name:mod_name,mod_license:mod_license,mod_version:mod_version,forge_version:forge_version]
+    inputs.properties replacements
+    expand replacements
+    from 'src/main/templates'
+    into 'build/generated/sources/modMetadata'
+}
+sourceSets.main.resources.srcDir generateModMetadata
+tasks.withType(JavaCompile).configureEach { options.encoding = 'UTF-8'; options.release = 17 }
+def translationEdition = providers.gradleProperty('edition').getOrElse('lite')
+if (!(translationEdition in ['lite','normal'])) { throw new GradleException('edition must be lite or normal') }
+processResources {
+    inputs.property 'edition', translationEdition
+    filesMatching('traduzmods-edition.properties') { filter { line -> 'edition=' + translationEdition } }
+}
+legacyForge.addModdingDependenciesTo(sourceSets.test)
+tasks.test { enabled = false }
+// Remapping invalidates Forge 47.4.0's original signatures. Only the standalone
+// test fixture discards those signatures; production artifacts and Forge installs are untouched.
+def mappedForge = layout.buildDirectory.file('moddev/artifacts/forge-' + minecraft_version + '-' + forge_version + '.jar')
+def standaloneForge = tasks.register('standaloneForgeTestFixture', Zip) {
+    dependsOn 'createMinecraftArtifacts'
+    archiveFileName = 'forge-standalone-tests.jar'
+    destinationDirectory = layout.buildDirectory.dir('test-fixtures')
+    from({ zipTree(mappedForge.get().asFile) }) {
+        exclude 'META-INF/*.SF', 'META-INF/*.RSA', 'META-INF/*.DSA', 'META-INF/*.EC'
+    }
+}
+def standaloneTestClasspath = sourceSets.test.runtimeClasspath.filter {
+    it != mappedForge.get().asFile
+} + files(standaloneForge.flatMap { it.archiveFile })
+tasks.register('integrationTest', JavaExec) {
+    dependsOn testClasses, standaloneForge
+    classpath = standaloneTestClasspath
+    mainClass = 'com.modtranslator.core.TranslationServiceIntegrationTest'
+    args layout.buildDirectory.dir('integration-' + System.currentTimeMillis()).get().asFile.absolutePath
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+}
+// Optional fixture uses installed GuideMe classes and a simulated screen, without bundling GuideMe.
+tasks.register('guideMeIntegration', JavaExec) {
+    dependsOn testClasses, standaloneForge
+    classpath = standaloneTestClasspath
+    if (providers.gradleProperty('guideMeJar').isPresent()) classpath += files(providers.gradleProperty('guideMeJar').get())
+    mainClass = 'com.modtranslator.core.GuideMeApiIntegration'
+    args layout.buildDirectory.dir('guideme-integration-' + System.currentTimeMillis()).get().asFile.absolutePath
+    javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(17) }
+}

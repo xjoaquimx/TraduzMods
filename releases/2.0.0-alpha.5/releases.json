@@ -1,0 +1,17 @@
+[
+  {
+    "file": "traduzmods-fabric-26.2-normal-2.0.0-alpha.5.jar",
+    "sha256": "cbcb01d12f0383b1ccfef4864c165385255635c7009a2ef0f5552cf3c017d4bf",
+    "bytes": 229253,
+    "loader": "fabric",
+    "minecraftRequirement": "26.2",
+    "version": "2.0.0-alpha.5-normal",
+    "edition": "normal",
+    "originalBinaryPreserved": true,
+    "historicalTests": {
+      "passed": 106,
+      "failed": 0,
+      "failures": []
+    }
+  }
+]

@@ -32,7 +32,8 @@ public final class RenderTranslation {
         return !WALKER.walk(frames -> frames.limit(48).anyMatch(frame -> {
             String name = frame.getClassName().toLowerCase(Locale.ROOT);
             String method = frame.getMethodName().toLowerCase(Locale.ROOT);
-            return name.startsWith("dev.ftb.mods.ftbquests.")
+            return name.equals("com.modtranslator.client.translationprogresshud")
+                    || name.startsWith("dev.ftb.mods.ftbquests.")
                     || name.startsWith("de.keksuccino.fancymenu.util.rendering.text.markdown.")
                     || name.startsWith("guideme.")
                     || name.contains("chatcomponent") || name.contains("chatscreen")

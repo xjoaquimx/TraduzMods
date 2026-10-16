@@ -13,6 +13,10 @@ public final class TextProtection {
                     + "|\\{[A-Za-z_][\\w.-]*:[^{}]*}"
                     + "|&(?![A-Za-z][A-Za-z0-9]*;)[0-9a-fk-orA-FK-OR]|§x(?:§[0-9a-fA-F]){6}|§[0-9a-fk-orA-FK-OR]|</?[A-Za-z][^<>]*>|https?://[^\\s<>]+"
                     + "|\\$\\([^)]*\\)|[a-z0-9_]+:[a-z0-9_/.-]+"
+                    + "|`[^`\\r\\n]+`|(?<![\\p{L}\\p{N}_])--[A-Za-z][\\w-]*(?:=[^\\s]+)?"
+                    + "|(?<![\\p{L}\\p{N}_])#[\\p{L}\\p{N}_][\\p{L}\\p{N}_-]*"
+                    + "|(?:[A-Za-z0-9_.-]+/)+[A-Za-z0-9_.-]+|\\b[A-Za-z0-9_.-]+\\.(?:tsx?|jsx?|json|md|java|py|ya?ml|toml|css|html)\\b"
+                    + "|\\b[A-Za-z][\\w.-]*@\\d+(?:\\.\\d+)*\\b|\\bv?\\d+\\.\\d+(?:\\.\\d+)*\\b"
                     + "|[\\r\\n\\t]|MODTRPHX*\\d+X");
 
     private TextProtection() {}

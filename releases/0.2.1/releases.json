@@ -1,0 +1,12 @@
+[
+  {
+    "file": "traduzmods-fabric-0.2.1-mc26.2.jar",
+    "sha256": "3ff759020ad16842a80c2cdc7a4eaa4279f9f97be2f3de2f9820a663e2e0f4a8",
+    "bytes": 110523,
+    "loader": "fabric",
+    "minecraftRequirement": "26.2",
+    "version": "0.2.1",
+    "edition": null,
+    "originalBinaryPreserved": true
+  }
+]

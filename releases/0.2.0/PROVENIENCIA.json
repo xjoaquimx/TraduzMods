@@ -1,0 +1,31 @@
+{
+  "version": "0.2.0",
+  "archivedOn": "2026-10-16",
+  "binaryRebuilt": false,
+  "newPerformanceBenchmark": false,
+  "relatedSourceCommit": null,
+  "sourceTagPolicy": "Related development commit for alpha.2/alpha.3; otherwise archival publication commit. A byte-for-byte reproducible source mapping is not asserted.",
+  "validation": "JAR metadata and SHA-256 checked now. Historical test counts are included only when an existing report matches the original binary hash.",
+  "artifacts": [
+    {
+      "file": "traduzmods-fabric-0.2.0.jar",
+      "sha256": "b6288a6beb5b8997c8c8444a67592a41130c7819ff8b3a1ec961032bfcd6e76d",
+      "bytes": 110638,
+      "loader": "fabric",
+      "minecraftRequirement": "~26.1.2",
+      "version": "0.2.0",
+      "edition": null,
+      "originalBinaryPreserved": true
+    },
+    {
+      "file": "traduzmods-neoforge-0.2.0.jar",
+      "sha256": "972605ca2de8f3ee9deef8e2663b8b88f9e0d855a9cccfb9538490dc7f524348",
+      "bytes": 110792,
+      "loader": "neoforge",
+      "minecraftRequirement": "[26.1.2]",
+      "version": "0.2.0",
+      "edition": null,
+      "originalBinaryPreserved": true
+    }
+  ]
+}

@@ -1,0 +1,8 @@
+14b76a7abca776f1c35af8d44242a9537e3ad9a5eb6fc5651ef7c038a5fdcdac  traduzmods-fabric-1.20.1-lite-2.0.0-alpha.3.jar
+f948d1fe00a028a16148c32ce2d41736e4ae1385c4b165a8e53e0ad8836c82c2  traduzmods-fabric-1.20.1-normal-2.0.0-alpha.3.jar
+dc4e0e09701775454a8a0c641f1e85c994654aa6bdc58c807a08b4caf6e8bfe6  traduzmods-fabric-1.21.1-lite-2.0.0-alpha.3.jar
+b83201bac5f998a3979fef5f1b216c2f3cd4d7bfbf91aa7f445bbfcebdfccd94  traduzmods-fabric-1.21.1-normal-2.0.0-alpha.3.jar
+6ff677cd1f2d48c4cb492f868843123c62009a38bf096f8009770ebbe0fb49af  traduzmods-fabric-26.2-lite-2.0.0-alpha.3.jar
+f66988f3f0d5f435972cf6d508e4331b857c2ea641e082ea0ce6265aac6ca45e  traduzmods-fabric-26.2-normal-2.0.0-alpha.3.jar
+ffe160dfb2688fd9371b7ac95704ab1957ee9ffa0ba93c1cb6ee8c68a388927d  traduzmods-neoforge-26.1.2-lite-2.0.0-alpha.3.jar
+01a7355c090b120863348c258c5eba7d1d239823a024fde53a8fc817091b0160  traduzmods-neoforge-26.1.2-normal-2.0.0-alpha.3.jar

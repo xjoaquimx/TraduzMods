@@ -9,12 +9,37 @@ public final class ModTextPolicy {
     private static volatile Set<String> npcNames = Set.of(), installedNames = Set.of();
     private static volatile Pattern brands = Pattern.compile("(?!)");
     private static volatile ProtectedTokens protectedTokens;
+    private static volatile Set<String> displayNames=Set.of();
     private static final Pattern ROLE = Pattern.compile("<[A-Za-z ]{1,60}>");
     private static final Pattern DIMENSION_ID = Pattern.compile("[a-z0-9_.-]+:[a-z0-9_/.-]+");
+    private static final Pattern UI_COUNT = Pattern.compile("(\\d+) (doing|todo|blocked|done|lines)");
     private static final Pattern INTEGER = Pattern.compile("-?\\d+");
     private record ProtectedTokens(Pattern formatting,Pattern brands,Pattern combined) {}
     private static final Map<String,String> UI = Map.ofEntries(
             Map.entry("Server Admin", "Administração do servidor"),
+            Map.entry("Pause", "Pausar"),
+            Map.entry("Stop", "Parar"),
+            Map.entry("Resume", "Retomar"),
+            Map.entry("Review", "Revisar"),
+            Map.entry("TODO", "A FAZER"),
+            Map.entry("DOING", "EM ANDAMENTO"),
+            Map.entry("REVIEW", "REVISÃO"),
+            Map.entry("DONE", "CONCLUÍDO"),
+            Map.entry("Doing", "Em andamento"),
+            Map.entry("Done", "Concluído"),
+            Map.entry("To do", "A fazer"),
+            Map.entry("worker", "executor"),
+            Map.entry("Worker", "Executor"),
+            Map.entry("Decide", "Decidir"),
+            Map.entry("Message", "Mensagem"),
+            Map.entry("Colors", "Cores"),
+            Map.entry("Permission needed", "Permissão necessária"),
+            Map.entry("Network access", "Acesso à rede"),
+            Map.entry("Allow", "Permitir"),
+            Map.entry("Deny", "Negar"),
+            Map.entry("Blocked", "Bloqueado"),
+            Map.entry("CI failing", "Falha no CI"),
+            Map.entry("waiting on deps", "aguardando dependências"),
             Map.entry("Global Properties", "Propriedades globais"),
             Map.entry("Default Dimension Properties", "Propriedades padrão das dimensões"),
             Map.entry("Cave Layers", "Camadas de cavernas"),
@@ -45,13 +70,16 @@ public final class ModTextPolicy {
         ModTextPolicy.installedNames=Set.copyOf(installedNames);
         rebuildNames();
     }
+    public static synchronized void registerDisplayNames(Collection<String> values) {
+        Set<String> next=Set.copyOf(values);if(next.equals(displayNames))return;displayNames=next;rebuildNames();
+    }
     public static boolean isNpcNameKey(String key) { return key!=null&&key.startsWith("npc.")&&key.endsWith(".name"); }
     public static synchronized void registerNpcNames(Collection<String> values) {
         npcNames=Set.copyOf(values); rebuildNames();
     }
     private static void rebuildNames() {
         Set<String> variants = new HashSet<>();
-        List<String> combined=new ArrayList<>(installedNames); combined.addAll(npcNames);
+        List<String> combined=new ArrayList<>(installedNames); combined.addAll(npcNames); combined.addAll(displayNames);
         for(String name:combined) {
             if(name == null || name.isBlank()) continue;
             name = name.strip();
@@ -80,6 +108,12 @@ public final class ModTextPolicy {
     }
     public static String canonicalUi(String source) {
         String result=UI.get(source);
+        if(result==null && source!=null) {
+            Matcher count=UI_COUNT.matcher(source);
+            if(count.matches())return count.group(1)+" "+switch(count.group(2)) {
+                case "doing" -> "em andamento";case "todo" -> "a fazer";case "blocked" -> "bloqueados";case "done" -> "concluídos";default -> "linhas";
+            };
+        }
         if(result==null && source!=null && source.startsWith("Dimension: ") && DIMENSION_ID.matcher(source.substring(11)).matches())return "Dimensão: "+source.substring(11);
         if(result==null && source!=null && source.startsWith("Vertical Chunk: ") && INTEGER.matcher(source.substring(16)).matches())return "Seção vertical: "+source.substring(16);
         if(result==null && source!=null && source.startsWith("<") && ROLE.matcher(source).matches()) {

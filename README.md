@@ -1,21 +1,23 @@
 # TraduzMods
 
-**2.0.0-alpha.4 — pré-lançamento:** [Release e oito JARs](https://github.com/xjoaquimx/TraduzMods/releases/tag/v2.0.0-alpha.4), [alterações técnicas](docs/CHANGELOG-2.0.0-alpha.4.md) e [validação no PC do autor](docs/validation-2.0-alpha.4.json). A **1.0.0 permanece a versão estável**.
+**3.0.0-alpha.1 — pré-lançamento:** [Release e 12 JARs](https://github.com/xjoaquimx/TraduzMods/releases/tag/v3.0.0-alpha.1), [alterações técnicas](docs/CHANGELOG-3.0.0-alpha.1.md) e [validação no PC do autor](docs/validation-3.0.0-alpha.1.json). A **1.0.0 permanece a versão estável**.
 
 Tradução automática de textos de mods para **português do Brasil**, feita localmente no computador. Usa as traduções nativas disponíveis, prioriza os textos que você abre e salva os resultados em disco para reutilizar nas próximas sessões.
 
 O modelo é **Tencent Hy-MT2-1.8B GGUF Q4_K_M**. Não precisa de chave de API. Modelo e runtime são baixados no primeiro uso; depois, a inferência é local. Esses arquivos não estão incluídos nos JARs deste repositório. O download automático do runtime atualmente atende **Windows x64**; outras plataformas não foram validadas nesta versão.
 
-## Download — 2.0.0-alpha.4
+## Download — 3.0.0-alpha.1
 
 | Minecraft | Loader | Lite | Normal |
 | --- | --- | --- | --- |
-| 1.20.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.20.1-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.20.1-normal-2.0.0-alpha.4.jar) |
-| 1.21.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.21.1-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-1.21.1-normal-2.0.0-alpha.4.jar) |
-| 26.2 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-26.2-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-fabric-26.2-normal-2.0.0-alpha.4.jar) |
-| 26.1.2 | NeoForge | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-neoforge-26.1.2-lite-2.0.0-alpha.4.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v2.0.0-alpha.4/traduzmods-neoforge-26.1.2-normal-2.0.0-alpha.4.jar) |
+| 1.20.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-fabric-1.20.1-lite-3.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-fabric-1.20.1-normal-3.0.0-alpha.1.jar) |
+| 1.21.1 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-fabric-1.21.1-lite-3.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-fabric-1.21.1-normal-3.0.0-alpha.1.jar) |
+| 26.2 | Fabric | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-fabric-26.2-lite-3.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-fabric-26.2-normal-3.0.0-alpha.1.jar) |
+| 1.21.1 | NeoForge | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-neoforge-1.21.1-lite-3.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-neoforge-1.21.1-normal-3.0.0-alpha.1.jar) |
+| 26.1.2 | NeoForge | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-neoforge-26.1.2-lite-3.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-neoforge-26.1.2-normal-3.0.0-alpha.1.jar) |
+| 1.20.1 | Forge | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-forge-1.20.1-lite-3.0.0-alpha.1.jar) | [Baixar](https://github.com/xjoaquimx/TraduzMods/releases/download/v3.0.0-alpha.1/traduzmods-forge-1.20.1-normal-3.0.0-alpha.1.jar) |
 
-SHA-256 e relatório: [manifesto](releases/2.0.0-alpha.4/releases.json), [checksums](releases/2.0.0-alpha.4/SHA256SUMS.txt) e [validação](releases/2.0.0-alpha.4/VALIDACAO.json). Detalhes e limites desta alpha estão no [guia de desenvolvimento](docs/DESENVOLVIMENTO-2.0.md).
+[Manifesto](releases/3.0.0-alpha.1/releases.json), [SHA-256](releases/3.0.0-alpha.1/SHA256SUMS.txt), [validação](releases/3.0.0-alpha.1/VALIDACAO.json) e [lançamentos históricos](docs/HISTORICO-DE-RELEASES.md).
 
 ## Download — 1.0.0 estável
 
@@ -43,19 +45,19 @@ Textos desenhados em imagens e alguns componentes dinâmicos incompatíveis pode
 
 ## Fontes e compilação
 
-Os projetos estão em `versions/fabric-1.20.1`, `versions/fabric-1.21.1`, `versions/fabric-26.2` e `versions/neoforge-26.1.2`. Cada projeto contém `common` e a pasta do loader. O núcleo é padronizado; as diferenças de API do Minecraft ficam nos adaptadores de plataforma.
+Os projetos estão em `versions/fabric-1.20.1`, `versions/fabric-1.21.1`, `versions/fabric-26.2` e `versions/neoforge-26.1.2`, `versions/neoforge-1.21.1` e `versions/forge-1.20.1`. Cada projeto contém `common` e a pasta do loader. O núcleo é padronizado; as diferenças de API do Minecraft ficam nos adaptadores de plataforma.
 
-Use **JDK 25 para executar o Gradle**. A versão Fabric 1.20.1 gera classes Java 17 e seus testes precisam de uma instalação JDK 17 detectável pelo Gradle; a Fabric 1.21.1 gera classes Java 21, e as plataformas 26 usam Java 25. O wrapper baixa o Gradle e as dependências na primeira compilação.
+Use **JDK 25 para executar o Gradle**. As versões 1.20.1 geram classes Java 17 e seus testes precisam de uma instalação JDK 17 detectável pelo Gradle; as versões 1.21.1 geram classes Java 21, e as plataformas 26 usam Java 25. O wrapper baixa o Gradle e as dependências na primeira compilação.
 
 Exemplo no Windows, na pasta `versions/fabric-1.20.1/fabric`:
 
 ```powershell
-.\gradlew.bat build "-Pmod_version=2.0.0-alpha.4-lite" -Pedition=lite
-.\gradlew.bat build "-Pmod_version=2.0.0-alpha.4-normal" -Pedition=normal
+.\gradlew.bat build "-Pmod_version=3.0.0-alpha.1-lite" -Pedition=lite
+.\gradlew.bat build "-Pmod_version=3.0.0-alpha.1-normal" -Pedition=normal
 .\gradlew.bat integrationTest -Pedition=normal
 ```
 
-Nos demais projetos, entre na pasta `fabric` ou `neoforge` correspondente e use os mesmos parâmetros. No Linux/macOS, use `./gradlew` no lugar de `gradlew.bat`. Os JARs compilados ficam em `build/libs`. O arquivo de edição é gerado na compilação; o identificador do mod é `modtranslator` em todas as variantes.
+Nos demais projetos, entre na pasta `fabric`, `neoforge` ou `forge` correspondente e use os mesmos parâmetros. No Linux/macOS, use `./gradlew` no lugar de `gradlew.bat`. Os JARs compilados ficam em `build/libs`. O arquivo de edição é gerado na compilação; o identificador do mod é `modtranslator` em todas as variantes.
 
 Verifique a padronização do núcleo e os hashes dos JARs estáveis e da alpha com:
 
@@ -63,6 +65,7 @@ Verifique a padronização do núcleo e os hashes dos JARs estáveis e da alpha 
 python scripts/sync_shared_core.py
 python scripts/verify_release.py
 python scripts/verify_alpha_release.py
+python scripts/verify_current_release.py
 ```
 
 ## Documentação e validação

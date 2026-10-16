@@ -18,7 +18,10 @@
     "TranslationProgressScreenMixin",
     "TranslationProgressMouseMixin",
     "AetherDocumentMixin",
-    "GuideMeDocumentMixin"
+    "GuideMeDocumentMixin",
+    "AgentCraftTextMixin",
+    "AgentCraftBoardMixin",
+    "AgentCraftScreenMixin"
   ],
   "injectors": {
     "defaultRequire": 1
